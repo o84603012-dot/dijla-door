@@ -1,0 +1,14 @@
+{
+  "name": "قياسات معرض دجلة",
+  "short_name": "قياسات دجلة",
+  "lang": "ar",
+  "dir": "rtl",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#0a266e",
+  "theme_color": "#0a266e",
+  "icons": [
+    { "src": "1000762922.png", "sizes": "1254x1254", "type": "image/png", "purpose": "any" }
+  ]
+}
