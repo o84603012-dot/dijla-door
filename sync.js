@@ -1,6 +1,6 @@
 (function () {
   var CK = "dijla-sync-code", JK = "dijla-jobs", KK = "dijla-sync-known", TK = "dijla-sync-tomb", LK = "dijla-sync-last";
-  var API = "/api/sync", MAXREC = 5500000;
+  var DB = "https://dijla-sync-default-rtdb.europe-west1.firebasedatabase.app", MAXREC = 12000000;
   function $(i) { return document.getElementById(i); }
   function get(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
   function set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
@@ -18,12 +18,32 @@
   function status(t) { if (stEl) stEl.textContent = t; }
   function hhmm(ts) { var d = new Date(ts); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
 
-  async function api(action, body, extra) {
-    var u = API + "?action=" + action + "&code=" + encodeURIComponent(code()) + (extra || "");
-    var o = body ? { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) } : {};
-    var r = await fetch(u, o);
-    if (!r.ok) throw new Error("http " + r.status);
+  function bad(r) { if (!r.ok) throw new Error("http " + r.status); return r; }
+  function base() { return DB.replace(/\/+$/, "") + "/dijla/" + code(); }
+  async function fb(method, path, body) {
+    var o = { method: method };
+    if (body !== undefined) o.body = JSON.stringify(body);
+    var r = bad(await fetch(base() + path + ".json", o));
     return r.json();
+  }
+  async function api(action, body, extra) {
+    if (action === "list") return { index: (await fb("GET", "/i")) || {} };
+    if (action === "get") {
+      var gid = decodeURIComponent((extra || "").replace("&id=", ""));
+      var v = await fb("GET", "/j/" + gid);
+      return { rec: v && v.s ? JSON.parse(v.s) : null };
+    }
+    if (action === "put") {
+      var rec = body.rec;
+      await fb("PUT", "/j/" + rec.id, { at: rec.at || Date.now(), name: rec.name || "", s: JSON.stringify(rec) });
+      await fb("PUT", "/i/" + rec.id, { at: rec.at || Date.now(), name: rec.name || "" });
+      return { ok: true };
+    }
+    if (action === "del") {
+      await fb("DELETE", "/j/" + body.id);
+      await fb("PUT", "/i/" + body.id, { at: body.at || Date.now(), del: true });
+      return { ok: true };
+    }
   }
 
   async function sync() {
