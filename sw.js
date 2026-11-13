@@ -1,4 +1,4 @@
-var V = "dijla-v2";
+var V = "dijla-v3";
 var FILES = ["./", "index.html", "manifest.json", "icon-192.png", "icon-512.png"];
 
 self.addEventListener("install", function (e) {
@@ -14,8 +14,9 @@ self.addEventListener("activate", function (e) {
 });
 
 self.addEventListener("fetch", function (e) {
-  var r = e.request;
-  if (r.method !== "GET" || new URL(r.url).origin !== location.origin) return;
+  var r = e.request, u = new URL(r.url);
+  if (r.method !== "GET" || u.origin !== location.origin) return;
+  if (u.pathname.indexOf("/api/") === 0) return;
   e.respondWith(
     fetch(r, { cache: "no-store" }).then(function (res) {
       var copy = res.clone();
