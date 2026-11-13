@@ -123,11 +123,12 @@
   var box = null;
   function ui() {
     var sd = $("sd"); if (!sd) return;
+    var xe = $("xexp"); if (xe && xe.parentNode) xe.parentNode.remove();
+    var xs = $("xstat"); if (xs) xs.remove();
+    var ss = $("ssum"); if (ss) ss.textContent = "المزامنة بين الهواتف (الكود)";
     if (box) box.remove();
     box = document.createElement("div");
-    box.style.cssText = "margin-top:14px;border-top:1px solid var(--line);padding-top:10px";
-    var h = document.createElement("div"); h.className = "lab"; h.textContent = "المزامنة التلقائية بين الهواتف";
-    box.appendChild(h);
+    box.style.cssText = "margin-top:6px";
     var row = document.createElement("div"); row.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;margin-top:6px";
     if (!code()) {
       var info = document.createElement("div"); info.style.cssText = "font-size:14px;color:var(--mut)";
