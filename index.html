@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>قياسات دجلة</title>
-<meta name="theme-color" content="#7fcf4b">
+<meta name="theme-color" content="#dff0dc">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="قياسات دجلة">
@@ -14,7 +14,7 @@
 <link rel="manifest" href="manifest.json">
 
 <style>
-:root{--bg:#eaf8d6;--ink:#1f3d12;--mut:#587448;--line:#c9e3a6;--card:#fff;--pen:#2e8b1f;--tape:#f5c518;--sel:#f7d43a;--selt:#1f3d12;--danger:#b3372b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+:root{--bg:#eef7ea;--ink:#1b4429;--mut:#5f7d66;--line:#cfe5cb;--card:#fbfef9;--pen:#2f7d46;--tape:#e8b923;--sel:#5db878;--selt:#0d3a1c;--danger:#b3372b;color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 *{box-sizing:border-box}
 html{scroll-padding-top:env(safe-area-inset-top,0px)}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Tajawal",system-ui,sans-serif;font-size:16px;line-height:1.5}
@@ -67,22 +67,48 @@ select:focus,input:focus,button:focus-visible,.photo:focus-within{outline:3px so
 .rep p{margin:2px 0}
 @page{margin:14mm}
 @media print{body{background:#fff!important;color:#000!important}.wrap>*:not(.rep){display:none!important}.rep{display:block;color:#000}}
-.tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:6px}
-.tabs button{font:inherit;font-weight:800;font-size:14px;line-height:1.25;padding:10px 2px;border:2px solid var(--pen);border-radius:4px;background:none;color:var(--pen)}
-.tabs button[aria-pressed="true"]{background:var(--sel);color:var(--selt)}
 .pamt{display:block;font-size:14px;color:var(--mut);margin-top:3px;min-height:20px}
 .sum{margin-top:12px;background:var(--card);border:2px solid var(--line);border-radius:10px;padding:10px 12px}
 .sum h3{margin:0 0 6px;font-size:17px}
 .sr{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-top:1px solid var(--line)}
 .sr b{direction:ltr}
 .sr.t{font-size:19px;font-weight:800;border-top:2px solid var(--ink)}
+
+/* ---- calm theme ---- */
+body{background:linear-gradient(165deg,#e4f4e2 0%,#f3f9ea 48%,#fdf2d9 100%) fixed}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:-1;background-image:linear-gradient(rgba(47,125,70,.05) 1px,transparent 1px),linear-gradient(90deg,rgba(47,125,70,.05) 1px,transparent 1px);background-size:28px 28px}
+h1{color:var(--ink)}
+input,select{border:1.5px solid var(--line);border-radius:18px;padding:14px 16px;background:var(--card)}
+input::placeholder{color:#8fa98f}
+select{appearance:none;-webkit-appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='9' viewBox='0 0 14 9'><path d='M1 1l6 6 6-6' fill='none' stroke='%232f7d46' stroke-width='2' stroke-linecap='round'/></svg>");background-repeat:no-repeat;background-position:left 16px center;padding-left:40px}
+.door{border:1.5px solid var(--line);border-radius:26px;background:rgba(255,255,255,.6);padding:16px;margin-top:18px}
+.num{border-color:var(--line);background:var(--card)}
+.bar button,.add,.act button,.photo,.job button,.opts button{border-radius:18px;border-width:1.5px;border-color:var(--line)}
+.bar button{background:var(--card);padding:16px}
+#jsave{background:var(--sel);color:var(--selt);border-color:transparent;box-shadow:0 10px 22px rgba(93,184,120,.35)}
+.add{background:rgba(255,255,255,.6);border-color:var(--pen)}
+.jobs,.sum{border:1.5px solid var(--line);border-radius:22px;background:rgba(255,255,255,.7)}
+.tot{border-radius:22px}
+.jobs summary{list-style:none;display:flex;align-items:center;justify-content:space-between}
+.jobs summary::-webkit-details-marker{display:none}
+.jobs summary::after{content:"\25BE";color:var(--pen);font-size:18px;transition:transform .2s}
+.jobs[open] summary::after{transform:rotate(180deg)}
+.tabs{margin-bottom:6px}
+.dd{position:relative}
+.ddb{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;font:inherit;font-weight:700;padding:14px 16px;border:1.5px solid var(--line);border-radius:18px;background:var(--card);color:var(--ink);cursor:pointer;text-align:right}
+.ddb .dda{color:var(--pen);font-size:18px;transition:transform .2s}
+.open>.ddb .dda,.dd.open .dda{transform:rotate(180deg)}
+.ddt.dde{color:var(--mut);font-weight:500}
+.ddp{margin-top:6px;border:1.5px solid var(--line);border-radius:18px;background:var(--card);padding:6px;display:flex;flex-direction:column;gap:4px;box-shadow:0 10px 26px rgba(27,68,41,.12)}
+.ddp button{font:inherit;font-weight:700;text-align:right;padding:12px 14px;border:0;border-radius:12px;background:none;color:var(--ink);cursor:pointer}
+.ddp button[aria-pressed="true"]{background:var(--sel);color:var(--selt)}
 @media (min-width:800px){.wrap{max-width:760px;padding:32px 24px}}
 </style>
 </head>
 <body>
 <div class="wrap">
 <h1 class="brand">قياسات معرض دجلة</h1>
-<div class="tabs" id="tabs"><button type="button" data-k="doors" aria-pressed="true">الأبواب</button><button type="button" data-k="windows" aria-pressed="false">شبابيك بلاستك</button><button type="button" data-k="slide" aria-pressed="false">شبابيك المنيوم</button><button type="button" data-k="vents" aria-pressed="false">الهوائيات</button><button type="button" data-k="counters" aria-pressed="false">الكاونترات</button><button type="button" data-k="mahjalat" aria-pressed="false">المحجلات</button><button type="button" data-k="prep" aria-pressed="false">تجهيز مواد</button></div>
+<div class="tabs dd" id="tabs"><button type="button" class="ddb" id="tabbtn"><span class="ddt" id="tabtxt">الأبواب</span><span class="dda">&#9662;</span></button><div class="ddp" id="tabpanel" style="display:none"><button type="button" data-k="doors" aria-pressed="true">الأبواب</button><button type="button" data-k="windows" aria-pressed="false">شبابيك بلاستك</button><button type="button" data-k="slide" aria-pressed="false">شبابيك المنيوم</button><button type="button" data-k="vents" aria-pressed="false">الهوائيات</button><button type="button" data-k="counters" aria-pressed="false">الكاونترات</button><button type="button" data-k="mahjalat" aria-pressed="false">المحجلات</button><button type="button" data-k="prep" aria-pressed="false">تجهيز مواد</button></div></div>
 <h2 id="ttl">الأبواب</h2>
 <div class="tape"></div>
 
@@ -116,7 +142,6 @@ select:focus,input:focus,button:focus-visible,.photo:focus-within{outline:3px so
   <button type="button" id="pdf">PDF للورشة (بدون أسعار)</button>
   <button type="button" id="pdfm" style="display:none">PDF قائمة مواد المحجلات</button>
   <button type="button" id="pdfk" style="display:none">PDF قائمة مواد المطبخ</button>
-  <button type="button" id="clear">مسح الكل</button>
 </div>
 <div class="msg" id="msg" role="status"></div>
 <div id="rep" class="rep"></div>
@@ -422,39 +447,34 @@ function drawField(d,i,tlab){
   return f;
 }
 var SC=["اسود لماع","اسود فحمي","انترسات","شمباني","كريمي"];
+function dd(list,get,set,ph){
+  var w=mk("div","dd"),b=mk("button","ddb"),t=mk("span","ddt"),ar=mk("span","dda","\u25BE"),p=mk("div","ddp"),bs=[];
+  b.type="button";b.appendChild(t);b.appendChild(ar);p.style.display="none";
+  function paint(){var v=get();t.textContent=v||ph||"اختر";t.className="ddt"+(v?"":" dde");bs.forEach(function(x){x.setAttribute("aria-pressed",x.dataset.v===v)})}
+  function close(){p.style.display="none";w.classList.remove("open")}
+  b.onclick=function(){var o=p.style.display==="none";p.style.display=o?"flex":"none";w.classList.toggle("open",o)};
+  list.forEach(function(o){var x=mk("button",null,o);x.type="button";x.dataset.v=o;x.setAttribute("aria-pressed","false");bs.push(x);x.onclick=function(){set(o);paint();close()};p.appendChild(x)});
+  var cl=mk("button",null,"\u2715 إلغاء الاختيار");cl.type="button";cl.style.color="var(--danger)";cl.onclick=function(){set("");paint();close()};p.appendChild(cl);
+  w.appendChild(b);w.appendChild(p);w.paint=paint;paint();return w;
+}
+var LOCS=["غرفة","حمام","W.C","مطبخ","منور","هول","صالة","استقبال"];
 function colField(d,i,list){
-  var f=mk("div","f"),l=mk("label",null,"اللون"),inp=document.createElement("input"),id="c"+kind+i,ch=mk("div","opts"),bs=[];
-  l.htmlFor=id;inp.id=id;inp.placeholder="اكتب اللون أو اختر";inp.value=d.col||"";
-  function mark(){bs.forEach(function(b){b.setAttribute("aria-pressed",b.textContent===(d.col||""))})}
-  inp.addEventListener("input",function(){d.col=inp.value;save();mark()});
-  ch.style.marginTop="6px";
-  (list||["أبيض","صاج","بلوطي","أسود"]).forEach(function(o){
-    var b=mk("button",null,o);b.type="button";bs.push(b);
-    b.onclick=function(){d.col=d.col===o?"":o;inp.value=d.col;save();mark()};
-    ch.appendChild(b);
-  });
-  mark();f.appendChild(l);f.appendChild(inp);f.appendChild(ch);return f;
+  var f=mk("div","f"),l=mk("label",null,"اللون"),inp=document.createElement("input"),id="c"+kind+i;
+  l.htmlFor=id;inp.id=id;inp.placeholder="أو اكتب لوناً آخر";inp.value=d.col||"";inp.style.marginTop="6px";
+  var w=dd(list||["أبيض","صاج","بلوطي","أسود"],function(){return d.col||""},function(v){d.col=v;inp.value=v;save()},"اختر اللون");
+  inp.addEventListener("input",function(){d.col=inp.value;save();w.paint()});
+  f.appendChild(l);f.appendChild(w);f.appendChild(inp);return f;
 }
 function locField(d,i,st){
-  var f=mk("div","f"),l=mk("label",null,"الموقع"),inp=document.createElement("input"),id="l"+kind+i,ch=mk("div","opts");
-  l.htmlFor=id;inp.id=id;inp.placeholder="مثال: صالة";inp.value=d.loc||"";
-  inp.addEventListener("input",function(){d.loc=inp.value;st.textContent=inp.value||K[kind].s;save()});
-  ch.style.marginTop="6px";
-  ["غرفة","حمام","تواليت","هول","صالة","استقبال"].forEach(function(o){
-    var b=mk("button",null,o);b.type="button";
-    b.onclick=function(){d.loc=o;inp.value=o;st.textContent=o;save()};
-    ch.appendChild(b);
-  });
-  f.appendChild(l);f.appendChild(inp);f.appendChild(ch);return f;
+  var f=mk("div","f"),l=mk("label",null,"الموقع"),inp=document.createElement("input"),id="l"+kind+i;
+  l.htmlFor=id;inp.id=id;inp.placeholder="أو اكتب موقعاً آخر";inp.value=d.loc||"";inp.style.marginTop="6px";
+  var w=dd(LOCS,function(){return d.loc||""},function(v){d.loc=v;inp.value=v;st.textContent=v||K[kind].s;save()},"اختر الموقع");
+  inp.addEventListener("input",function(){d.loc=inp.value;st.textContent=inp.value||K[kind].s;save();w.paint()});
+  f.appendChild(l);f.appendChild(w);f.appendChild(inp);return f;
 }
 function opts(lab,d,key,list){
-  var f=mk("div","f"),l=mk("span","lab",lab),g=mk("div","opts");
-  list.forEach(function(o){
-    var b=mk("button",null,o);b.type="button";b.setAttribute("aria-pressed",d[key]===o);
-    b.onclick=function(){d[key]=d[key]===o?"":o;save();tot();Array.prototype.forEach.call(g.children,function(x){x.setAttribute("aria-pressed",x.textContent===d[key])})};
-    g.appendChild(b);
-  });
-  f.appendChild(l);f.appendChild(g);return f;
+  var f=mk("div","f"),l=mk("span","lab",lab);
+  f.appendChild(l);f.appendChild(dd(list,function(){return d[key]||""},function(v){d[key]=v;save();tot()},"اختر"));return f;
 }
 function shrink(file,cb){
   var r=new FileReader();
@@ -700,7 +720,7 @@ function render(){
     if(data[kind].length>1){var rm=mk("button","rm",K[kind].rm);rm.type="button";
       rm.onclick=function(){data[kind].splice(i,1);save();render()};h.appendChild(rm)}
     c.appendChild(h);
-    if(kind==="doors"||kind==="windows"||kind==="slide")c.appendChild(locField(d,i,st));
+    if(kind==="doors"||kind==="windows"||kind==="slide"||kind==="vents")c.appendChild(locField(d,i,st));
     if(kind==="mahjalat"){c.appendChild(mahjalatFields(d,i,st));c.appendChild(mjPrice(d,i));c.appendChild(field("ملاحظة",d,"note",false,"n"+i));box.appendChild(c);return}
     if(kind==="counters"){c.appendChild(secTitle("فصال الكاونتر"));c.appendChild(drawField(d,i));c.appendChild(secTitle("ملاحظات عامة"));c.appendChild(field("اكتب أي ملاحظات تخص الطلب أو التركيب",d,"note",false,"n"+i));c.appendChild(counterPrice(d,i));var ab2=mk("button","add","إضافة كاونتر ثاني");ab2.type="button";ab2.onclick=function(){$("add").onclick()};c.appendChild(ab2);box.appendChild(c);return}
     
@@ -716,8 +736,8 @@ function render(){
   });
   tot();
 }
-function setKind(k){kind=k;document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.k===k)});$("ttl").textContent=K[k].t;$("add").textContent=K[k].add;$("tl").textContent=K[k].cnt;$("pdfm").style.display=k==="prep"?"":"none";$("pdfk").style.display=k==="prep"?"":"none";$("add").style.display=k==="prep"?"none":"";$("tt").style.display=k==="prep"?"none":"";render()}
-$("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(b)setKind(b.dataset.k)});
+function setKind(k){kind=k;document.querySelectorAll("#tabs button").forEach(function(b){b.setAttribute("aria-pressed",b.dataset.k===k)});$("ttl").textContent=K[k].t;$("tabtxt").textContent=K[k].t;$("tabpanel").style.display="none";$("tabs").classList.remove("open");$("add").textContent=K[k].add;$("tl").textContent=K[k].cnt;$("pdfm").style.display=k==="prep"?"":"none";$("pdfk").style.display=k==="prep"?"":"none";$("add").style.display=k==="prep"?"none":"";$("tt").style.display=k==="prep"?"none":"";render()}
+$("tabs").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;if(b.id==="tabbtn"){var p=$("tabpanel"),o=p.style.display==="none";p.style.display=o?"flex":"none";$("tabs").classList.toggle("open",o);return}if(b.dataset.k)setKind(b.dataset.k)});
 function tot(){
   if(kind==="prep"){$("mjt").style.display="none";$("sum").style.display="none";return}
   var a=0,ar=(kind!=="doors"&&kind!=="counters"&&kind!=="mahjalat");data[kind].forEach(function(d){a+=areaOf(kind,d)});
@@ -856,11 +876,11 @@ async function drawReport(only,priced){
     cx.font="700 36px"+FF;cx.textAlign="right";cx.fillText(K[k].t,W-M,y);y+=58;
     var hv,fr;
     if(k==="doors"){hv=["الموقع","العرض","الارتفاع","الاتجاه والعثرة","اللون","ملاحظة"];fr=[0.16,0.11,0.12,0.19,0.14,0.28]}
-    else if(k==="vents"){hv=["#","العرض","الارتفاع","المساحة م²","النوع","المادة","اللون","ملاحظة"];fr=[0.06,0.10,0.11,0.12,0.11,0.15,0.12,0.23]}
+    else if(k==="vents"){hv=["الموقع","العرض","الارتفاع","المساحة م²","النوع","المادة","اللون","ملاحظة"];fr=[0.14,0.09,0.10,0.11,0.10,0.14,0.11,0.21]}
     else if(k==="slide"){hv=["الموقع","العرض","الارتفاع","النوع","الزجاج","اللون","ملاحظة"];fr=[0.14,0.10,0.11,0.13,0.13,0.14,0.25]}
     else{hv=["الموقع","العرض","الارتفاع","اللون","المبردة","ملاحظة"];fr=[0.15,0.10,0.11,0.14,0.14,0.36]}
     var rows=list.map(function(d,i){
-      var v=[(k==="vents"?String(i+1):(d.loc||String(i+1))),d.w||"-",d.h||"-"];
+      var v=[(d.loc||String(i+1)),d.w||"-",d.h||"-"];
       if(k==="doors"){v.push([d.dir,d.thr].filter(Boolean).join(" / ")||"-",d.col||"-")}else if(k==="vents"){v.push(areaOf(k,d)>0?fmt(areaOf(k,d)):"-",d.mv||"-",d.vm||"-",d.col||"-")}else if(k==="slide"){v.push(d.typ||"-",d.glz||"-",d.col||"-")}else{v.push(d.col||"-",d.cool||"-")}
       v.push(d.note||"");return v;
     });
@@ -1084,18 +1104,13 @@ $("jsave").onclick=function(){
 };
 $("jnew").onclick=function(){
   var saved=storeCurrent();
-  if(!saved&&dirty()){$("msg").textContent="اكتب اسم الزبون الحالي لحفظ بياناته، أو اضغط مسح الكل.";return}
+  if(!saved&&dirty()){$("msg").textContent="اكتب اسم الزبون الحالي لحفظ بياناته أولاً.";return}
   data=blank();data.id=uid();save();loadInputs();render();
   $("msg").textContent=saved?"تم حفظ الزبون السابق وفتح زبون جديد.":"زبون جديد.";
   try{window.scrollTo(0,0)}catch(e){}
 };
-if(!MGR){$("pdfc").style.display="none";$("clear").style.display="none"}
+if(!MGR){$("pdfc").style.display="none"}
 renderJobs();
-$("clear").onclick=function(){
-  var b=$("clear");if(!b.dataset.arm){b.dataset.arm="1";b.textContent="اضغط للتأكيد";$("msg").textContent="اضغط مرة ثانية لمسح كل البيانات.";setTimeout(function(){delete b.dataset.arm;b.textContent="مسح الكل"},4000);return}delete b.dataset.arm;b.textContent="مسح الكل";{
-    data=blank();data.id=uid();save();
-    Object.keys(cmap).forEach(function(id){$(id).value=""});render();$("msg").textContent="تم المسح"}
-};
 render();
 
 function jstamp(){var d=new Date();return d.getFullYear()+("0"+(d.getMonth()+1)).slice(-2)+("0"+d.getDate()).slice(-2)}
