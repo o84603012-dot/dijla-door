@@ -105,7 +105,8 @@
       status(msg);
       if (pulled > 0) { status(msg + " جارٍ تحديث الشاشة…"); setTimeout(function () { location.reload(); }, 1200); }
     } catch (e) {
-      status("تعذرت المزامنة الآن، ستعاد المحاولة تلقائياً.");
+      var em = String((e && e.message) || e);
+      status("تعذرت المزامنة: " + em + (/401|403/.test(em) ? " (قواعد Firebase تمنع الكتابة: انشر القواعد)" : (/Failed to fetch|NetworkError|Load failed/i.test(em) ? " (تعذر الوصول إلى Firebase: تأكد من الإنترنت ومن رابط قاعدة البيانات)" : "")));
     }
     busy = false;
     if (again) { again = false; schedule(); }
