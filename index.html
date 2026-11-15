@@ -122,6 +122,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .hlogo{display:block;width:84px;height:84px;border-radius:20px;margin:10px auto 0}
 .sq{width:100%;margin-bottom:10px}
 @media (min-width:800px){.wrap{max-width:760px;padding:32px 24px}}
+.iqa{margin-top:6px}.iqz{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:6px}.iqz button{font:inherit;font-weight:800;font-size:14px;padding:6px 10px;border:2px solid var(--line);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer}.iqw{border:2px solid var(--pen);border-radius:4px;padding:8px 10px;background:var(--card);font-weight:800;font-size:16px;line-height:1.7}.iqw small{display:block;font-weight:700;color:var(--mut);font-size:12px}
+
 </style>
 </head>
 <body>
@@ -129,15 +131,12 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <div class="topbar"><button type="button" class="tb" id="backBtn" hidden>&rarr; الرئيسية</button><h1 class="brand" id="brand">قياسات معرض دجلة</h1><button type="button" class="tb" id="userBtn" aria-label="الحساب وتسجيل الدخول"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="userTxt">دخول</span></button></div>
 
 <section data-scr="home" id="scr-home">
-<img class="hlogo" src="icon-192.png" alt="" onerror="this.style.display='none'">
 <div class="menu">
 <button type="button" class="menu-new" id="mnew"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>إضافة قياس جديد</span></button>
 <button type="button" id="mcust"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.3c2.8.2 5 2.4 5 5.7"/></svg><span>الزبائن <span id="mcnt"></span></span></button>
 <button type="button" id="msearch"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span>البحث عن زبون</span></button>
 <button type="button" id="mmeas"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v4M11 8v3M15 8v4M19 8v3"/></svg><span>القياسات</span></button>
-<button type="button" id="msec"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5"/><rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5"/><rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5"/></svg><span>الأقسام</span></button>
 <button type="button" id="mmat"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></svg><span>المواد</span></button>
-<button type="button" id="mbak"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5"/><path d="M4 19h16"/></svg><span>النسخ الاحتياطي</span></button>
 <button type="button" id="msync"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4.5L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4.5L20 15"/><path d="M20 20v-5h-5"/></svg><span>المزامنة</span></button>
 </div>
 </section>
@@ -162,6 +161,13 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <div class="jtw"><table class="jtt"><thead><tr><th>الزبون</th><th>الهاتف</th><th>العنوان</th><th>موعد التركيب</th><th>التفاصيل</th><th>أخذ القياس</th></tr></thead><tbody id="jtb"></tbody></table></div>
 </details>
 <details class="jobs" id="jd"><summary id="jsum">الزبائن المحفوظون (0)</summary><div id="jl"></div></details>
+<div class="jobs"><b>تصدير ملف كل الزبائن PDF</b>
+<div id="jbar" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button type="button" class="jb" id="jcopy">نسخ جميع الزبائن</button><button type="button" class="jb" id="jall">تصدير ملف كل الزبائن (PDF)</button></div><div id="jstat" style="font-size:14px;margin-bottom:6px" role="status"></div>
+</div>
+<details class="jobs"><summary>نسخة احتياطية قابلة للاستيراد</summary>
+<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" id="xexp" style="font:inherit;font-weight:800;padding:10px 16px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer;display:inline-block">تصدير الزبائن</button><label for="ximf" style="font:inherit;font-weight:800;padding:10px 16px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer;display:inline-block">استيراد الزبائن</label><input type="file" id="ximf" style="display:none"></div>
+<div id="xstat" style="margin-top:8px;font-size:14px"></div>
+</details>
 </section>
 
 <section data-scr="search" id="scr-search" hidden>
@@ -219,17 +225,6 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <button type="button" data-k="vents"><span>الهوائيات</span></button>
 <button type="button" data-k="counters"><span>الكاونترات</span></button>
 <button type="button" data-k="mahjalat"><span>المحجلات</span></button>
-</div>
-</section>
-
-<section data-scr="backup" id="scr-backup" hidden>
-<h2 class="scr-h">النسخ الاحتياطي</h2>
-<div class="jobs"><b>نسخة احتياطية قابلة للاستيراد</b>
-<div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" id="xexp" style="font:inherit;font-weight:800;padding:10px 16px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer;display:inline-block">تصدير الزبائن</button><label for="ximf" style="font:inherit;font-weight:800;padding:10px 16px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer;display:inline-block">استيراد الزبائن</label><input type="file" id="ximf" style="display:none"></div>
-<div id="xstat" style="margin-top:8px;font-size:14px"></div>
-</div>
-<div class="jobs"><b>ملف كل الزبائن (نهاية اليوم)</b>
-<div id="jbar" style="display:flex;gap:8px;flex-wrap:wrap;margin:8px 0"><button type="button" class="jb" id="jcopy">نسخ جميع الزبائن</button><button type="button" class="jb" id="jall">تصدير ملف كل الزبائن (PDF)</button></div><div id="jstat" style="font-size:14px;margin-bottom:6px" role="status"></div>
 </div>
 </section>
 
@@ -317,6 +312,22 @@ function curToggle(d,onch){
   b.onclick=function(){d.cur="iqd";p();save();onch()};
   p();o.appendChild(a);o.appendChild(b);w.appendChild(l);w.appendChild(o);return w;
 }
+var AU=["","واحد","اثنان","ثلاثة","أربعة","خمسة","ستة","سبعة","ثمانية","تسعة"],AT=["عشرة","أحد عشر","اثنا عشر","ثلاثة عشر","أربعة عشر","خمسة عشر","ستة عشر","سبعة عشر","ثمانية عشر","تسعة عشر"],AD=["","","عشرون","ثلاثون","أربعون","خمسون","ستون","سبعون","ثمانون","تسعون"],AH=["","مئة","مئتان","ثلاثمئة","أربعمئة","خمسمئة","ستمئة","سبعمئة","ثمانمئة","تسعمئة"];
+function a3(n){var h=Math.floor(n/100),r=n%100,p=[];if(h)p.push(AH[h]);if(r){if(r<10)p.push(AU[r]);else if(r<20)p.push(AT[r-10]);else{var u=r%10,t=Math.floor(r/10);p.push(u?AU[u]+" و"+AD[t]:AD[t])}}return p.join(" و")}
+function aSc(g,one,two,few,many){if(g===1)return one;if(g===2)return two;var w=g===200?"مئتا":a3(g);return w+" "+((g>=3&&g<=10)?few:many)}
+function iqdWords(x){x=Math.round(Number(x));if(!(x>0)||x>=1e12)return "";var b=Math.floor(x/1e9),m=Math.floor(x%1e9/1e6),t=Math.floor(x%1e6/1e3),r=x%1e3,p=[];if(b)p.push(aSc(b,"مليار","ملياران","مليارات","مليار"));if(m)p.push(aSc(m,"مليون","مليونان","ملايين","مليون"));if(t)p.push(aSc(t,"ألف","ألفان","آلاف","ألف"));if(r)p.push(a3(r));var o=p.join(" و").replace(/(ألف|مليون|مليار|مئت)ان$/,"$1ا");if(x===1)return "دينار عراقي واحد";if(x===2)return "ديناران عراقيان";return o+" دينار عراقي"}
+function iqdAid(inp,d){
+  var w=mk("div","iqa");if(!isI(d))return w;
+  var z=mk("div","iqz"),bx=mk("div","iqw"),cap=mk("small",null,"المبلغ كتابةً"),tx=mk("span",null,"");
+  [["00","مئات"],["000","ألف"],["000000","مليون"]].forEach(function(x){
+    var b=mk("button",null,x[0]+" "+x[1]);b.type="button";
+    b.onclick=function(){var v=parseFloat(inp.value);if(!(v>0))return;inp.value=String(Math.round(v*Math.pow(10,x[0].length)));inp.dispatchEvent(new Event("input",{bubbles:true}));try{inp.focus()}catch(e){}};
+    z.appendChild(b);
+  });
+  function upd(){tx.textContent=iqdWords(parseFloat(inp.value))||"اكتب المبلغ وسيظهر هنا كتابةً"}
+  inp.addEventListener("input",upd);upd();
+  bx.appendChild(cap);bx.appendChild(tx);w.appendChild(z);w.appendChild(bx);return w;
+}
 function priceField(d,i){
   if(!MGR)return mk("div");
   var w=mk("div"),f=mk("div","f"),l=mk("label",null,PL[kind]+" "+csf(d)),inp=document.createElement("input"),am=mk("span","pamt"),id="pr"+kind+i;
@@ -324,7 +335,7 @@ function priceField(d,i){
   am.dataset.i=i;
   inp.addEventListener("input",function(){var old=d.price;d.price=inp.value;if((kind==="windows"||kind==="slide")&&i===0){data[kind].forEach(function(o,j){if(j>0&&(!o.price||o.price===old)){o.price=inp.value;var e=$("pr"+kind+j);if(e)e.value=inp.value}})}save();tot()});
   w.appendChild(curToggle(d,function(){if((kind==="windows"||kind==="slide")&&i===0)data[kind].forEach(function(o,j){if(j>0&&(!o.price||o.price===d.price))o.cur=d.cur});save();rerender()}));
-  f.appendChild(l);f.appendChild(inp);f.appendChild(am);w.appendChild(f);return w;
+  f.appendChild(l);f.appendChild(inp);f.appendChild(iqdAid(inp,d));f.appendChild(am);w.appendChild(f);return w;
 }
 function extrasField(d,i){
   if(!MGR)return mk("div");
@@ -346,7 +357,7 @@ function extrasField(d,i){
       p.addEventListener("input",function(){e.p=p.value;save();sum();tot()});
       r.appendChild(t);r.appendChild(p);
       if(d.ex.length>1){var x=mk("button","rm","حذف");x.type="button";x.style.margin="0";x.onclick=function(){d.ex.splice(j,1);save();draw();tot()};r.appendChild(x)}
-      list.appendChild(r);
+      list.appendChild(r);if(isI(d))list.appendChild(iqdAid(p,d));
     });
     sum();
   }
@@ -517,8 +528,8 @@ function photoField(d,i,lab,alt,key){key=key||"photo";
 }
 function drawField(d,i,tlab){
   var TL=tlab||"كتابة نص";
-  var CW=1000,CH=720,f=mk("div","f"),hint=mk("div",null,"زر «"+TL+"» يضيف نصاً أو رقماً على الرسم. اسحب النص لتحريكه، واسحب ⟳ لتدويره، والمسه لتعديله. القلم للرسم فقط."),wrap=mk("div"),cv=document.createElement("canvas"),ov=mk("div"),g=cv.getContext("2d"),hist=[],tool="none",on=false,lx=0,ly=0,bar=mk("div"),stt=mk("div"),bt={},lbls=d.lbl||[];
-  var MSG={none:"اختر كتابة نص أو قلم الرسم.",pen:"القلم يعمل للرسم فقط. اضغط «"+TL+"» لإضافة نص أو رقم.",er:"الممحاة تعمل على الرسم فقط.",text:"المس مكاناً على الرسم للإضافة، اسحب النص لتحريكه، اسحب ⟳ لتدويره، المسه لتعديله، + و − لتكبير النص أو تصغيره، ✕ للحذف."};
+  var CW=1000,CH=720,f=mk("div","f"),hint=mk("div",null,"زر «"+TL+"» يضيف نصاً أو رقماً على الرسم. اسحب النص لتحريكه، واسحب ⟳ لتدويره، والمسه لتعديله. القلم للرسم فقط. زرّا «خط مستقيم» و«مربع» يضيفان شكلاً تسحبه لتحريكه، وتكبّره وتدوّره من الدائرة الخضراء في الزاوية."),wrap=mk("div"),cv=document.createElement("canvas"),ov=mk("div"),g=cv.getContext("2d"),hist=[],tool="none",on=false,lx=0,ly=0,bar=mk("div"),stt=mk("div"),bt={},lbls=d.lbl||[];
+  var MSG={none:"اختر كتابة نص أو قلم الرسم.",pen:"القلم يعمل للرسم فقط. اضغط «"+TL+"» لإضافة نص أو رقم.",er:"الممحاة تعمل على الرسم فقط.",shp:"اسحب الشكل لتحريكه، واسحب الدائرة الخضراء في الزاوية لتكبيره وتدويره، ✕ للحذف.",text:"المس مكاناً على الرسم للإضافة، اسحب النص لتحريكه، اسحب ⟳ لتدويره، المسه لتعديله، + و − لتكبير النص أو تصغيره، ✕ للحذف."};
   hint.style.cssText="font-size:14px;color:var(--mut);margin-bottom:6px";
   stt.style.cssText="font-size:14px;font-weight:700;margin-top:8px";
   cv.width=CW;cv.height=CH;
@@ -556,6 +567,7 @@ function drawField(d,i,tlab){
   function drawLabels(){
     ov.innerHTML="";var size=Math.max(13,Math.round(cv.clientWidth*0.04)),act=tool==="text";
     lbls.forEach(function(lb){
+      if(lb.k){drawShape(lb);return}
       var e=document.createElement("div"),tx=document.createElement("span"),xx=document.createElement("span"),sx=0,sy=0,ox=0,oy=0,moved=false,drag=false;
       e.style.cssText="position:absolute;pointer-events:"+(act?"auto":"none")+";touch-action:none;cursor:move;user-select:none;-webkit-user-select:none;background:rgba(255,255,255,.9);border:"+(act?"2px dashed":"1px solid")+" var(--pen);border-radius:6px;padding:1px 6px;color:#111;font-weight:800;white-space:nowrap;display:flex;align-items:center;gap:6px;transform:translate(-50%,-50%) rotate("+(lb.r||0)+"deg);unicode-bidi:plaintext;left:"+lb.x*100+"%;top:"+lb.y*100+"%;font-size:"+Math.round(size*(lb.z||1))+"px";
       tx.textContent=lb.t;xx.textContent="✕";xx.style.cssText="font-size:.7em;color:var(--danger);cursor:pointer;padding:2px 3px;display:"+(act?"inline":"none");
@@ -588,10 +600,44 @@ function drawField(d,i,tlab){
       e.appendChild(zm);e.appendChild(tx);e.appendChild(zp);e.appendChild(xx);e.appendChild(rt);ov.appendChild(e);
     });
   }
+function drawShape(lb){
+  var W0=cv.clientWidth||300,as=tool==="shp",ln=lb.k==="line",th=Math.max(2,Math.round(W0*0.005)),sh=document.createElement("div"),hd=document.createElement("span"),xx=document.createElement("span"),sx=0,sy=0,ox=0,oy=0,drag=false,mv=false,rs=false,cxn=0,cyn=0;
+  function apply(){var L=Math.max(16,(lb.w||0.3)*W0);sh.style.width=L+"px";sh.style.height=(ln?30:L)+"px";sh.style.transform="translate(-50%,-50%) rotate("+(lb.r||0)+"deg)"}
+  sh.style.cssText="position:absolute;left:"+lb.x*100+"%;top:"+lb.y*100+"%;box-sizing:border-box;touch-action:none;user-select:none;-webkit-user-select:none;cursor:move;pointer-events:"+(as?"auto":"none")+";"+(ln?"":"border:"+th+"px solid #111;")+(as?"outline:1px dashed var(--pen);outline-offset:3px;":"");
+  apply();
+  if(ln){var bl=document.createElement("div");bl.style.cssText="position:absolute;left:0;right:0;top:50%;height:"+th+"px;margin-top:-"+(th/2)+"px;background:#111";sh.appendChild(bl)}
+  hd.setAttribute("aria-label","تكبير وتدوير");
+  hd.style.cssText="position:absolute;left:100%;top:"+(ln?"50%":"100%")+";width:30px;height:30px;margin:-15px 0 0 -15px;border-radius:50%;background:var(--pen);border:3px solid #fff;box-shadow:0 0 0 1px var(--pen);box-sizing:border-box;touch-action:none;cursor:nwse-resize;display:"+(as?"block":"none");
+  xx.textContent="✕";xx.setAttribute("aria-label","حذف");
+  xx.style.cssText="position:absolute;left:0;top:"+(ln?"50%":"0")+";width:24px;height:24px;margin:-12px 0 0 "+(ln?"-30px":"-12px")+";border-radius:50%;background:#fff;border:2px solid var(--danger);color:var(--danger);font-size:13px;font-weight:900;line-height:20px;text-align:center;cursor:pointer;box-sizing:border-box;display:"+(as?"block":"none");
+  xx.addEventListener("pointerdown",function(ev){ev.stopPropagation()});
+  xx.addEventListener("click",function(ev){ev.stopPropagation();lbls.splice(lbls.indexOf(lb),1);persist();drawLabels()});
+  hd.addEventListener("pointerdown",function(ev){ev.stopPropagation();ev.preventDefault();rs=true;var b=sh.getBoundingClientRect();cxn=b.left+b.width/2;cyn=b.top+b.height/2;try{hd.setPointerCapture(ev.pointerId)}catch(z){}});
+  hd.addEventListener("pointermove",function(ev){
+    if(!rs)return;ev.stopPropagation();ev.preventDefault();
+    var dx=ev.clientX-cxn,dy=ev.clientY-cyn,dist=Math.sqrt(dx*dx+dy*dy),a=Math.atan2(dy,dx)*180/Math.PI;
+    if(ln){lb.w=Math.min(1.6,Math.max(0.04,2*dist/W0))}else{a-=45;lb.w=Math.min(1.2,Math.max(0.04,dist*Math.SQRT2/W0))}
+    a=((a%360)+540)%360-180;var q=Math.round(a/15)*15;if(Math.abs(a-q)<3)a=q;lb.r=Math.round(a);apply();
+  });
+  hd.addEventListener("pointerup",function(ev){if(!rs)return;ev.stopPropagation();rs=false;persist()});
+  hd.addEventListener("pointercancel",function(){rs=false});
+  sh.addEventListener("pointerdown",function(ev){if(ev.target===hd||ev.target===xx)return;ev.preventDefault();drag=true;mv=false;sx=ev.clientX;sy=ev.clientY;ox=lb.x;oy=lb.y;try{sh.setPointerCapture(ev.pointerId)}catch(z){}});
+  sh.addEventListener("pointermove",function(ev){
+    if(!drag)return;var r=cv.getBoundingClientRect(),dx=ev.clientX-sx,dy=ev.clientY-sy;
+    if(Math.abs(dx)+Math.abs(dy)>3)mv=true;if(!mv)return;
+    lb.x=Math.min(1,Math.max(0,ox+dx/r.width));lb.y=Math.min(1,Math.max(0,oy+dy/r.height));
+    sh.style.left=lb.x*100+"%";sh.style.top=lb.y*100+"%";
+  });
+  sh.addEventListener("pointerup",function(){if(!drag)return;drag=false;if(mv)persist()});
+  sh.addEventListener("pointercancel",function(){drag=false});
+  sh.appendChild(hd);sh.appendChild(xx);ov.appendChild(sh);
+}
+function addShape(k){var n=lbls.filter(function(l){return l.k}).length;lbls.push(k==="line"?{k:"line",x:0.5,y:0.35+0.1*(n%5),w:0.5,r:0}:{k:"box",x:0.5,y:0.62,w:0.22,r:0});tool="shp";persist();mark()}
   function mark(){
+    [bt.line,bt.box].forEach(function(b){var a=tool==="shp";b.setAttribute("aria-pressed",a);b.style.background=a?"var(--sel)":"var(--card)";b.style.color=a?"var(--selt)":"var(--pen)"});
     ["text","pen","er"].forEach(function(k){var a=tool===k,b=bt[k];b.setAttribute("aria-pressed",a);b.style.background=a?"var(--sel)":"var(--card)";b.style.color=a?"var(--selt)":"var(--pen)"});
     cv.style.touchAction=(tool==="pen"||tool==="er")?"none":"auto";
-    cv.style.cursor=tool==="text"?"text":(tool==="none"?"default":"crosshair");
+    cv.style.cursor=tool==="text"?"text":((tool==="none"||tool==="shp")?"default":"crosshair");
     stt.textContent=MSG[tool];drawLabels();
   }
   function btn(txt,fn){var b=mk("button",null,txt);b.type="button";b.style.cssText="font:inherit;font-weight:800;padding:8px 14px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen)";b.onclick=fn;bar.appendChild(b);return b}
@@ -599,6 +645,8 @@ function drawField(d,i,tlab){
   bt.text=btn(TL,function(){tool="text";mark();var n=lbls.length,yy=0.2+0.1*(n%6);askText("",0.5,yy,function(v){if(!v)return;lbls.push({t:v,x:0.5,y:yy,r:0});persist();drawLabels()})});
   bt.pen=btn("قلم",pick("pen"));
   bt.er=btn("ممحاة",pick("er"));
+  bt.line=btn("خط مستقيم",function(){addShape("line")});
+  bt.box=btn("مربع",function(){addShape("box")});
   btn("تراجع",function(){var h=hist.pop();if(!h)return;paint(h.u,function(){d.draw=h.e?"":url();save()})});
   var pl=document.createElement("label"),pf=document.createElement("input");
   pl.textContent="إضافة صورة للرسم";
@@ -769,7 +817,7 @@ function mjPrice(d,i){
     qi.addEventListener("blur",function(){upd()});
     pi.addEventListener("input",function(){d[x[1]]=pi.value;save();tot()});
     rb.onclick=function(){d[x[0]]="";save();qi.value=x[4]&&x[4](d)?fmt(x[4](d)):"";tot()};
-    ga.appendChild(la);ga.appendChild(qi);gb.appendChild(lb);gb.appendChild(pi);g.appendChild(ga);g.appendChild(gb);
+    ga.appendChild(la);ga.appendChild(qi);gb.appendChild(lb);gb.appendChild(pi);gb.appendChild(iqdAid(pi,d));g.appendChild(ga);g.appendChild(gb);
     f.appendChild(h);f.appendChild(g);f.appendChild(res);f.appendChild(rb);w.appendChild(f);
     ups.push(upd);upd();
   });
@@ -888,27 +936,41 @@ function kitchenMats(d,i){
   w.appendChild(secTitle("مواد أخرى (غير مسجلة)"));w.appendChild(xmField(d,"kx"));
   return w;
 }
+var prepOpen=null;
 function renderPrep(box){
   function head(t){var h=mk("h2",null,t);h.style.cssText="font-size:20px;margin:18px 0 4px;text-align:center";return h}
-  box.appendChild(head("الكاونترات ومواده"));
-  data.counters.forEach(function(d,i){
-    var c=mk("div","door"),h=mk("div","dh");
-    h.appendChild(mk("span","num",String(i+1)));h.appendChild(mk("strong",null,"كاونتر "+(i+1)));
-    c.appendChild(h);c.appendChild(kitchenMats(d,i));box.appendChild(c);
+  var bar=mk("div");bar.style.cssText="display:grid;gap:10px;margin:8px 0 12px";
+  [["c","مواد المطبخ"],["m","مواد المحجلات"],["d","مواد البلاستك"]].forEach(function(x){
+    var b=mk("button",null,x[1]),on=prepOpen===x[0];b.type="button";b.setAttribute("aria-pressed",String(on));
+    b.style.cssText="font:inherit;font-weight:800;font-size:19px;padding:16px 12px;border:2px solid var(--pen);border-radius:6px;cursor:pointer;"+(on?"background:var(--pen);color:#fff":"background:var(--card);color:var(--pen)");
+    b.onclick=function(){prepOpen=on?null:x[0];rerender()};bar.appendChild(b);
   });
-  var a2=mk("button","add","إضافة كاونتر");a2.type="button";
-  a2.onclick=function(){data.counters.push({s:["","","","","",""],note:""});save();render()};box.appendChild(a2);
-  box.appendChild(head("المحجلات ومواده"));
-  data.mahjalat.forEach(function(d,i){
-    var c=mk("div","door"),h=mk("div","dh");
-    h.appendChild(mk("span","num",String(i+1)));h.appendChild(mk("strong",null,"محجل "+(i+1)));
-    c.appendChild(h);c.appendChild(mahjalatMats(d,i));box.appendChild(c);
-  });
-  var a1=mk("button","add","إضافة محجل");a1.type="button";
-  a1.onclick=function(){data.mahjalat.push({st:[{n:"",t:""}],note:""});save();render()};box.appendChild(a1);
-  box.appendChild(head("الأبواب والشبابيك ومواده"));
-  if(!data.dwm)data.dwm={};
-  var dc=mk("div","door");dc.appendChild(dwField(data.dwm));box.appendChild(dc);
+  box.appendChild(bar);
+  if(prepOpen==="c"){
+    box.appendChild(head("الكاونترات ومواده"));
+    data.counters.forEach(function(d,i){
+      var c=mk("div","door"),h=mk("div","dh");
+      h.appendChild(mk("span","num",String(i+1)));h.appendChild(mk("strong",null,"كاونتر "+(i+1)));
+      c.appendChild(h);c.appendChild(kitchenMats(d,i));box.appendChild(c);
+    });
+    var a2=mk("button","add","إضافة كاونتر");a2.type="button";
+    a2.onclick=function(){data.counters.push({s:["","","","","",""],note:""});save();render()};box.appendChild(a2);
+  }
+  if(prepOpen==="m"){
+    box.appendChild(head("المحجلات ومواده"));
+    data.mahjalat.forEach(function(d,i){
+      var c=mk("div","door"),h=mk("div","dh");
+      h.appendChild(mk("span","num",String(i+1)));h.appendChild(mk("strong",null,"محجل "+(i+1)));
+      c.appendChild(h);c.appendChild(mahjalatMats(d,i));box.appendChild(c);
+    });
+    var a1=mk("button","add","إضافة محجل");a1.type="button";
+    a1.onclick=function(){data.mahjalat.push({st:[{n:"",t:""}],note:""});save();render()};box.appendChild(a1);
+  }
+  if(prepOpen==="d"){
+    box.appendChild(head("مواد البلاستك (الأبواب والشبابيك)"));
+    if(!data.dwm)data.dwm={};
+    var dc=mk("div","door");dc.appendChild(dwField(data.dwm));box.appendChild(dc);
+  }
 }
 function render(){
   MJR=[];
@@ -1138,7 +1200,7 @@ async function drawReport(only,priced){
     if(lbl&&lbl.length){
       var fz=Math.max(18,Math.round(iw*0.04)),x0=Math.round((W-iw)/2);
       cx.font="700 "+fz+"px"+FF;cx.textBaseline="middle";cx.textAlign="center";
-      lbl.forEach(function(lb){var fl=Math.round(fz*(lb.z||1));cx.font="700 "+fl+"px"+FF;var px=x0+lb.x*iw,py=y+lb.y*ih,tw=cx.measureText(lb.t).width,bx=-tw/2-8,by=-fl*0.75,bw=tw+16,bh=fl*1.5;cx.save();cx.translate(px,py);cx.rotate((lb.r||0)*Math.PI/180);cx.fillStyle="rgba(255,255,255,0.92)";cx.fillRect(bx,by,bw,bh);cx.strokeStyle="#333";cx.lineWidth=2;cx.strokeRect(bx,by,bw,bh);cx.fillStyle="#000";cx.fillText(lb.t,0,0);cx.restore()});
+      lbl.forEach(function(lb){if(lb.k){cx.save();cx.beginPath();cx.rect(x0,y,iw,ih);cx.clip();cx.translate(x0+lb.x*iw,y+lb.y*ih);cx.rotate((lb.r||0)*Math.PI/180);cx.strokeStyle="#111";cx.lineWidth=Math.max(2,iw*0.005);var SL=(lb.w||0.3)*iw;if(lb.k==="line"){cx.beginPath();cx.moveTo(-SL/2,0);cx.lineTo(SL/2,0);cx.stroke()}else{cx.strokeRect(-SL/2,-SL/2,SL,SL)}cx.restore();return}var fl=Math.round(fz*(lb.z||1));cx.font="700 "+fl+"px"+FF;var px=x0+lb.x*iw,py=y+lb.y*ih,tw=cx.measureText(lb.t).width,bx=-tw/2-8,by=-fl*0.75,bw=tw+16,bh=fl*1.5;cx.save();cx.translate(px,py);cx.rotate((lb.r||0)*Math.PI/180);cx.fillStyle="rgba(255,255,255,0.92)";cx.fillRect(bx,by,bw,bh);cx.strokeStyle="#333";cx.lineWidth=2;cx.strokeRect(bx,by,bw,bh);cx.fillStyle="#000";cx.fillText(lb.t,0,0);cx.restore()});
       cx.textBaseline="top";cx.textAlign="right";
     }
     y+=ih+24;
@@ -1287,11 +1349,12 @@ function saveBlob(b,fn){
 }
 function pdfName(tag){var n=String(data.c.n||"زبون").trim().replace(/[\\\/:*?"<>|]+/g,"-")||"زبون";return "دجلة-"+n+"-"+tag+"-"+jstamp()+".pdf"}
 async function doPdf(only,priced){
+  var sv=(only!=="tbl")&&storeCurrent();
   $("msg").textContent="جارٍ تجهيز الملف…";
   try{
     var blob=buildPdf(await drawReport(only,priced)),tag=only==="tbl"?"جدول-الزبائن":only==="all"?"تجهيز-المواد":only==="counters"?"مواد-المطبخ":only==="dw"?"مواد-الأبواب-والشبابيك":only?"مواد-المحجلات":priced?"الشركة-بالأسعار":"الورشة-بدون-أسعار",fn=pdfName(tag);
     if(dl){await dl.save({filename:fn,data:blob})}else{await saveBlob(blob,fn)}
-    $("msg").textContent="تم حفظ الملف: "+fn;
+    $("msg").textContent="تم حفظ الملف: "+fn+(sv?" — وتم حفظ الزبون تلقائياً":"");
   }catch(e){$("msg").textContent=(e&&e.code==="declined")?"تم إلغاء الحفظ.":"تعذر إنشاء الملف، حاول مرة أخرى."}
 }
 $("pdf").onclick=function(){return doPdf()};
@@ -1511,9 +1574,7 @@ $("mnew").onclick=function(){go("newm")};
 document.querySelectorAll("[data-nk]").forEach(function(b){b.onclick=function(){$("jnew").onclick();setKind(b.dataset.nk);go("sections")}});
 $("mcust").onclick=function(){go("customers")};
 $("msearch").onclick=function(){go("search")};
-$("msec").onclick=function(){if(kind==="prep")setKind("doors");go("sections")};
 $("mmat").onclick=function(){setKind("prep");go("sections")};
-$("mbak").onclick=function(){go("backup")};
 $("mmeas").onclick=function(){go("kinds")};
 document.querySelectorAll("#kmenu button").forEach(function(b){b.onclick=function(){setKind(b.dataset.k);go("sections")}});
 $("msync").onclick=function(){go("sync")};
