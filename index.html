@@ -135,7 +135,6 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <button type="button" class="menu-new" id="mnew"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>إضافة قياس جديد</span></button>
 <button type="button" id="mcust"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.3c2.8.2 5 2.4 5 5.7"/></svg><span>الزبائن <span id="mcnt"></span></span></button>
 <button type="button" id="msearch"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span>البحث عن زبون</span></button>
-<button type="button" id="mmeas"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="8" width="18" height="8" rx="1.5"/><path d="M7 8v4M11 8v3M15 8v4M19 8v3"/></svg><span>القياسات</span></button>
 <button type="button" id="mmat"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></svg><span>المواد</span></button>
 <button type="button" id="msync"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4.5L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4.5L20 15"/><path d="M20 20v-5h-5"/></svg><span>المزامنة</span></button>
 </div>
@@ -1197,7 +1196,7 @@ async function drawReport(only,priced){
     var _u=0,r=Math.min(mw/im.naturalWidth,mh/im.naturalHeight,1.6),iw=Math.round(im.naturalWidth*r),ih=Math.round(im.naturalHeight*r);
     if(y+ih+60>H-M)np();
     cx.font="700 30px"+FF;cx.fillStyle="#000";cx.textAlign="right";cx.textBaseline="top";cx.fillText(title,W-M,y);y+=46;
-    cx.drawImage(im,Math.round((W-iw)/2),y,iw,ih);cx.strokeStyle="#333";cx.lineWidth=2;cx.strokeRect(Math.round((W-iw)/2),y,iw,ih);
+    cx.drawImage(im,Math.round((W-iw)/2),y,iw,ih);
     if(lbl&&lbl.length){
       var fz=Math.max(box?8:18,Math.round(iw*0.04)),x0=Math.round((W-iw)/2);
       cx.font="700 "+fz+"px"+FF;cx.textBaseline="middle";cx.textAlign="center";
@@ -1584,7 +1583,6 @@ document.querySelectorAll("[data-nk]").forEach(function(b){b.onclick=function(){
 $("mcust").onclick=function(){go("customers")};
 $("msearch").onclick=function(){go("search")};
 $("mmat").onclick=function(){setKind("prep");go("sections")};
-$("mmeas").onclick=function(){go("kinds")};
 document.querySelectorAll("#kmenu button").forEach(function(b){b.onclick=function(){setKind(b.dataset.k);go("sections")}});
 $("msync").onclick=function(){go("sync")};
 $("cnew").onclick=function(){$("jnew").onclick();go("sections")};
@@ -1769,7 +1767,7 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
   var ov = null;
   function overlay() {
     if (!READY) return;
-    if (authGet() || localStorage.getItem(SKIP)) { if (ov) { ov.remove(); ov = null; } return; }
+    if (authGet()) { if (ov) { ov.remove(); ov = null; } return; }
     if (ov) ov.remove();
     ov = document.createElement("div");
     ov.style.cssText = "position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:linear-gradient(165deg,#e4f4e2 0%,#f3f9ea 48%,#fdf2d9 100%)";
@@ -1778,16 +1776,13 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
     var logo = document.createElement("img"); logo.src = "icon-192.png"; logo.alt = "";
     logo.style.cssText = "width:96px;height:96px;border-radius:22px;margin:0 auto 10px;display:block"; logo.onerror = function () { logo.style.display = "none"; };
     var h = document.createElement("div"); h.textContent = "قياسات معرض دجلة"; h.style.cssText = "font-size:24px;font-weight:800;color:var(--ink)";
-    var sub = document.createElement("div"); sub.textContent = "سجّل الدخول لمزامنة بياناتك بين الأجهزة"; sub.style.cssText = "font-size:14px;color:var(--mut);margin:4px 0 16px";
+    var sub = document.createElement("div"); sub.textContent = "سجّل الدخول للمتابعة"; sub.style.cssText = "font-size:14px;color:var(--mut);margin:4px 0 16px";
     var uin = document.createElement("input"); uin.placeholder = "اسم الحساب"; uin.setAttribute("autocomplete", "username"); uin.setAttribute("aria-label", "اسم الحساب"); uin.style.cssText = "margin-bottom:10px;text-align:right";
     var pin = document.createElement("input"); pin.type = "password"; pin.placeholder = "كلمة المرور"; pin.setAttribute("autocomplete", "current-password"); pin.setAttribute("aria-label", "كلمة المرور"); pin.style.cssText = "margin-bottom:12px;text-align:right";
     var msg = document.createElement("div"); msg.style.cssText = "min-height:22px;font-size:14px;font-weight:700;color:var(--danger);margin-bottom:8px";
-    var row = document.createElement("div"); row.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:8px";
-    var bin = btn("دخول", function () { go("in"); }, true), bup = btn("إنشاء حساب", function () { go("up"); });
-    row.appendChild(bin); row.appendChild(bup);
-    var sk = document.createElement("button"); sk.type = "button"; sk.textContent = "المتابعة بدون حساب";
-    sk.style.cssText = "margin-top:14px;font:inherit;font-size:14px;border:0;background:none;color:var(--mut);text-decoration:underline;cursor:pointer";
-    sk.onclick = function () { localStorage.setItem(SKIP, "1"); ov.remove(); ov = null; };
+    var row = document.createElement("div"); row.style.cssText = "display:grid;grid-template-columns:1fr;gap:8px";
+    var bin = btn("دخول", function () { go("in"); }, true), bup = bin;
+    row.appendChild(bin);
     async function go(mode) {
       var u = (uin.value || "").trim(), p = pin.value || "";
       msg.style.color = "var(--danger)";
@@ -1797,14 +1792,14 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
       if (!navigator.onLine) { msg.textContent = "لا يوجد اتصال بالإنترنت."; return; }
       bin.disabled = bup.disabled = true; msg.style.color = "var(--mut)"; msg.textContent = "جارٍ التحقق…";
       try {
-        var j = await idp(mode === "up" ? "signUp" : "signInWithPassword", { email: emailOf(u), password: p, returnSecureToken: true });
+        var j = await idp("signInWithPassword", { email: emailOf(u), password: p, returnSecureToken: true });
         saveTokens(u, j); localStorage.removeItem(KK); localStorage.removeItem(TK); localStorage.removeItem(SKIP);
         ov.remove(); ov = null; ui(); sync();
       } catch (e) { msg.style.color = "var(--danger)"; msg.textContent = errAr(e); }
       bin.disabled = bup.disabled = false;
     }
     [uin, pin].forEach(function (x) { x.addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); go("in"); } }); });
-    [logo, h, sub, uin, pin, msg, row, sk].forEach(function (x) { card.appendChild(x); });
+    [logo, h, sub, uin, pin, msg, row].forEach(function (x) { card.appendChild(x); });
     ov.appendChild(card); document.body.appendChild(ov);
   }
 
@@ -1828,9 +1823,9 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
       });
       off.style.color = "var(--danger)"; row.appendChild(off);
     } else {
-      var info = document.createElement("div"); info.style.cssText = "font-size:14px;color:var(--mut)"; info.textContent = "لست مسجلاً. سجّل الدخول لمزامنة زبائنك بين الأجهزة.";
+      var info = document.createElement("div"); info.style.cssText = "font-size:14px;color:var(--mut)"; info.textContent = "لست مسجلاً. سجّل الدخول للمتابعة.";
       box.appendChild(info);
-      row.appendChild(btn("تسجيل الدخول / إنشاء حساب", function () { localStorage.removeItem(SKIP); overlay(); }, true));
+      row.appendChild(btn("تسجيل الدخول", function () { localStorage.removeItem(SKIP); overlay(); }, true));
     }
     box.appendChild(row);
     stEl = document.createElement("div"); stEl.style.cssText = "margin-top:8px;font-size:14px";
