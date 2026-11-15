@@ -1148,6 +1148,256 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
   window.addEventListener("load", function(){ navigator.serviceWorker.register("sw.js").catch(function(){}); });
 }
 </script>
-<script src="sync.js"></script>
+<script>
+(function () {
+  var AK = "__API_KEY__", READY = false;
+  READY = AK.indexOf("AIza") === 0;
+  var DB = "https://dijla-sync-default-rtdb.europe-west1.firebasedatabase.app", MAXREC = 12000000;
+  var SK = "dijla-auth", JK = "dijla-jobs", KK = "dijla-sync-known", TK = "dijla-sync-tomb", LK = "dijla-sync-last", SKIP = "dijla-skip";
+  function $(i) { return document.getElementById(i); }
+  function get(k, d) { try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : d; } catch (e) { return d; } }
+  function set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } }
+  function hhmm(ts) { var d = new Date(ts); return ("0" + d.getHours()).slice(-2) + ":" + ("0" + d.getMinutes()).slice(-2); }
+
+  /* ---------- الحساب ---------- */
+  function authGet() { return get(SK, null); }
+  function authSet(a) { set(SK, a); }
+  function hex(str) { var b = new TextEncoder().encode(str), s = "", i; for (i = 0; i < b.length; i++) s += ("0" + b[i].toString(16)).slice(-2); return s; }
+  function emailOf(u) { return "u" + hex(String(u).trim().toLowerCase()) + "@dijla.app"; }
+  async function idp(path, body) {
+    var r = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:" + path + "?key=" + AK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    var j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) { var m = (j.error && j.error.message) || ("http " + r.status); var er = new Error(m); er.code = m; throw er; }
+    return j;
+  }
+  function saveTokens(u, j) {
+    authSet({ u: u, uid: j.localId || j.user_id, rt: j.refreshToken || j.refresh_token, it: j.idToken || j.id_token, exp: Date.now() + ((parseInt(j.expiresIn || j.expires_in, 10) || 3600) - 120) * 1000 });
+  }
+  function errAr(e) {
+    var m = String((e && (e.code || e.message)) || e);
+    if (/EMAIL_EXISTS/.test(m)) return "اسم المستخدم مستخدم، اختر اسماً آخر أو سجّل الدخول.";
+    if (/INVALID_LOGIN_CREDENTIALS|INVALID_PASSWORD|EMAIL_NOT_FOUND/.test(m)) return "اسم المستخدم أو كلمة المرور غير صحيحة.";
+    if (/WEAK_PASSWORD/.test(m)) return "كلمة المرور ضعيفة (6 أحرف على الأقل).";
+    if (/OPERATION_NOT_ALLOWED/.test(m)) return "تسجيل الدخول بالبريد وكلمة المرور غير مفعّل في Firebase.";
+    if (/TOO_MANY_ATTEMPTS/.test(m)) return "محاولات كثيرة، انتظر قليلاً ثم أعد المحاولة.";
+    if (/API key|API_KEY|INVALID_KEY/i.test(m)) return "مفتاح Firebase غير صحيح.";
+    if (/Failed to fetch|NetworkError|Load failed/i.test(m)) return "لا يوجد اتصال بالإنترنت.";
+    return "تعذر الأمر: " + m;
+  }
+  async function token() {
+    var a = authGet(); if (!a) throw new Error("NO_AUTH");
+    if (a.exp > Date.now()) return a.it;
+    var r = await fetch("https://securetoken.googleapis.com/v1/token?key=" + AK, { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: "grant_type=refresh_token&refresh_token=" + encodeURIComponent(a.rt) });
+    var j = {}; try { j = await r.json(); } catch (e) {}
+    if (!r.ok) {
+      var m = (j.error && j.error.message) || ("http " + r.status);
+      if (/TOKEN_EXPIRED|INVALID_REFRESH_TOKEN|USER_NOT_FOUND|USER_DISABLED/.test(m)) { logout(true); throw new Error("NO_AUTH"); }
+      throw new Error(m);
+    }
+    a.it = j.id_token; a.rt = j.refresh_token || a.rt; a.exp = Date.now() + ((parseInt(j.expires_in, 10) || 3600) - 120) * 1000; authSet(a);
+    return a.it;
+  }
+  function logout(silent) {
+    localStorage.removeItem(SK); localStorage.removeItem(KK); localStorage.removeItem(TK); localStorage.removeItem(SKIP);
+    ui(); if (!silent) status("تم تسجيل الخروج. بيانات هذا الهاتف باقية عليه.");
+    overlay();
+  }
+
+  /* ---------- المزامنة ---------- */
+  var stEl = null, busy = false, again = false, timer = null, lastSeen = null;
+  function status(t) { if (stEl) stEl.textContent = t; }
+
+  async function fb(method, path, body, retry) {
+    var a = authGet(); if (!a) throw new Error("NO_AUTH");
+    var t = await token();
+    var o = { method: method }; if (body !== undefined) o.body = JSON.stringify(body);
+    var r = await fetch(DB.replace(/\/+$/, "") + "/dijla/users/" + a.uid + path + ".json?auth=" + encodeURIComponent(t), o);
+    if (r.status === 401 && !retry) { var b = authGet(); b.exp = 0; authSet(b); return fb(method, path, body, true); }
+    if (!r.ok) throw new Error("http " + r.status);
+    return r.json();
+  }
+  async function api(action, body, extra) {
+    if (action === "list") return { index: (await fb("GET", "/i")) || {} };
+    if (action === "get") {
+      var gid = decodeURIComponent((extra || "").replace("&id=", ""));
+      var v = await fb("GET", "/j/" + gid);
+      return { rec: v && v.s ? JSON.parse(v.s) : null };
+    }
+    if (action === "put") {
+      var rec = body.rec;
+      await fb("PUT", "/j/" + rec.id, { at: rec.at || Date.now(), name: rec.name || "", s: JSON.stringify(rec) });
+      await fb("PUT", "/i/" + rec.id, { at: rec.at || Date.now(), name: rec.name || "" });
+      return { ok: true };
+    }
+    if (action === "del") {
+      await fb("DELETE", "/j/" + body.id);
+      await fb("PUT", "/i/" + body.id, { at: body.at || Date.now(), del: true });
+      return { ok: true };
+    }
+  }
+
+  async function sync() {
+    if (!authGet()) return;
+    if (busy) { again = true; return; }
+    if (!navigator.onLine) { status("لا يوجد اتصال: ستتم المزامنة تلقائياً عند عودة الإنترنت."); return; }
+    busy = true; status("جارٍ المزامنة…");
+    try {
+      var jobs = get(JK, []), known = get(KK, []), tomb = get(TK, {});
+      var pulled = 0, pushed = 0, big = 0, i;
+      var byId = {}; jobs.forEach(function (j) { byId[j.id] = j; });
+
+      known.forEach(function (id) { if (!byId[id] && !tomb[id]) tomb[id] = Date.now(); });
+      jobs.forEach(function (j) { if (tomb[j.id] && (j.at || 0) > tomb[j.id]) delete tomb[j.id]; });
+
+      var idx = (await api("list")).index || {};
+      var id, r, l;
+
+      for (id in idx) {
+        r = idx[id]; l = byId[id];
+        if (r.del) {
+          if (l && (l.at || 0) <= r.at) { jobs = jobs.filter(function (j) { return j.id !== id; }); delete byId[id]; pulled++; }
+          delete tomb[id];
+          continue;
+        }
+        if (tomb[id] && tomb[id] >= r.at) continue;
+        if (!l || (l.at || 0) < r.at) {
+          var rec = (await api("get", null, "&id=" + encodeURIComponent(id))).rec;
+          if (rec && rec.id) {
+            if (l) jobs = jobs.filter(function (j) { return j.id !== id; });
+            jobs.push(rec); byId[id] = rec; pulled++; delete tomb[id];
+          }
+        }
+      }
+
+      for (i = 0; i < jobs.length; i++) {
+        l = jobs[i]; r = idx[l.id];
+        if (!r || (l.at || 0) > r.at) {
+          var s = JSON.stringify({ rec: l });
+          if (s.length > MAXREC) { big++; continue; }
+          await api("put", { rec: l });
+          pushed++;
+        }
+      }
+
+      for (id in tomb) {
+        r = idx[id];
+        if (!r || (!r.del && r.at < tomb[id])) { await api("del", { id: id, at: tomb[id] }); pushed++; }
+        if (!r || r.del || r.at < tomb[id]) delete tomb[id];
+      }
+
+      jobs.sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
+      set(KK, jobs.map(function (j) { return j.id; }));
+      set(TK, tomb);
+      if (pulled > 0) set(JK, jobs);
+      lastSeen = localStorage.getItem(JK) || "";
+      var now = Date.now(); localStorage.setItem(LK, String(now));
+      var msg = "تمت المزامنة " + hhmm(now) + " — تنزيل " + pulled + "، رفع " + pushed + (big ? "، " + big + " زبون كبير جداً بسبب الصور لم يُرفع" : "") + ".";
+      status(msg);
+      if (pulled > 0) { status(msg + " جارٍ تحديث الشاشة…"); setTimeout(function () { location.reload(); }, 1200); }
+    } catch (e) {
+      var em = String((e && e.message) || e);
+      if (em === "NO_AUTH") status("سجّل الدخول أولاً.");
+      else status("تعذرت المزامنة: " + em + (/401|403/.test(em) ? " (قواعد Firebase تمنع الكتابة: انشر القواعد الجديدة)" : (/Failed to fetch|NetworkError|Load failed/i.test(em) ? " (تعذر الوصول إلى Firebase، تأكد من الإنترنت)" : "")));
+    }
+    busy = false;
+    if (again) { again = false; schedule(); }
+  }
+  function schedule() { clearTimeout(timer); timer = setTimeout(sync, 2500); }
+
+  /* ---------- الواجهة ---------- */
+  function btn(txt, fn, primary) {
+    var b = document.createElement("button");
+    b.type = "button"; b.textContent = txt; b.onclick = fn;
+    b.style.cssText = "font:inherit;font-weight:800;padding:12px 16px;border:1.5px solid " + (primary ? "transparent" : "var(--line)") + ";border-radius:18px;background:" + (primary ? "var(--sel)" : "var(--card)") + ";color:" + (primary ? "var(--selt)" : "var(--pen)") + ";cursor:pointer";
+    return b;
+  }
+  var ov = null;
+  function overlay() {
+    if (!READY) return;
+    if (authGet() || localStorage.getItem(SKIP)) { if (ov) { ov.remove(); ov = null; } return; }
+    if (ov) ov.remove();
+    ov = document.createElement("div");
+    ov.style.cssText = "position:fixed;inset:0;z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:linear-gradient(165deg,#e4f4e2 0%,#f3f9ea 48%,#fdf2d9 100%)";
+    var card = document.createElement("div");
+    card.style.cssText = "width:100%;max-width:420px;background:rgba(255,255,255,.85);border:1.5px solid var(--line);border-radius:28px;padding:26px 22px;text-align:center;box-shadow:0 18px 40px rgba(27,68,41,.15)";
+    var logo = document.createElement("img"); logo.src = "icon-192.png"; logo.alt = "";
+    logo.style.cssText = "width:96px;height:96px;border-radius:22px;margin:0 auto 10px;display:block"; logo.onerror = function () { logo.style.display = "none"; };
+    var h = document.createElement("div"); h.textContent = "قياسات معرض دجلة"; h.style.cssText = "font-size:24px;font-weight:800;color:var(--ink)";
+    var sub = document.createElement("div"); sub.textContent = "سجّل الدخول لمزامنة بياناتك بين الأجهزة"; sub.style.cssText = "font-size:14px;color:var(--mut);margin:4px 0 16px";
+    var uin = document.createElement("input"); uin.placeholder = "اسم المستخدم"; uin.setAttribute("autocomplete", "username"); uin.setAttribute("aria-label", "اسم المستخدم"); uin.style.cssText = "margin-bottom:10px;text-align:right";
+    var pin = document.createElement("input"); pin.type = "password"; pin.placeholder = "كلمة المرور"; pin.setAttribute("autocomplete", "current-password"); pin.setAttribute("aria-label", "كلمة المرور"); pin.style.cssText = "margin-bottom:12px;text-align:right";
+    var msg = document.createElement("div"); msg.style.cssText = "min-height:22px;font-size:14px;font-weight:700;color:var(--danger);margin-bottom:8px";
+    var row = document.createElement("div"); row.style.cssText = "display:grid;grid-template-columns:1fr 1fr;gap:8px";
+    var bin = btn("دخول", function () { go("in"); }, true), bup = btn("إنشاء حساب", function () { go("up"); });
+    row.appendChild(bin); row.appendChild(bup);
+    var sk = document.createElement("button"); sk.type = "button"; sk.textContent = "المتابعة بدون حساب";
+    sk.style.cssText = "margin-top:14px;font:inherit;font-size:14px;border:0;background:none;color:var(--mut);text-decoration:underline;cursor:pointer";
+    sk.onclick = function () { localStorage.setItem(SKIP, "1"); ov.remove(); ov = null; };
+    async function go(mode) {
+      var u = (uin.value || "").trim(), p = pin.value || "";
+      msg.style.color = "var(--danger)";
+      if (u.length < 3) { msg.textContent = "اسم المستخدم 3 أحرف على الأقل."; return; }
+      if (u.length > 20) { msg.textContent = "اسم المستخدم 20 حرفاً كحد أقصى."; return; }
+      if (p.length < 6) { msg.textContent = "كلمة المرور 6 أحرف على الأقل."; return; }
+      if (!navigator.onLine) { msg.textContent = "لا يوجد اتصال بالإنترنت."; return; }
+      bin.disabled = bup.disabled = true; msg.style.color = "var(--mut)"; msg.textContent = "جارٍ التحقق…";
+      try {
+        var j = await idp(mode === "up" ? "signUp" : "signInWithPassword", { email: emailOf(u), password: p, returnSecureToken: true });
+        saveTokens(u, j); localStorage.removeItem(KK); localStorage.removeItem(TK); localStorage.removeItem(SKIP);
+        ov.remove(); ov = null; ui(); sync();
+      } catch (e) { msg.style.color = "var(--danger)"; msg.textContent = errAr(e); }
+      bin.disabled = bup.disabled = false;
+    }
+    [uin, pin].forEach(function (x) { x.addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); go("in"); } }); });
+    [logo, h, sub, uin, pin, msg, row, sk].forEach(function (x) { card.appendChild(x); });
+    ov.appendChild(card); document.body.appendChild(ov);
+  }
+
+  var box = null;
+  function ui() {
+    var sd = $("sd"); if (!sd) return;
+    var xe = $("xexp"); if (xe && xe.parentNode) xe.parentNode.remove();
+    var xs = $("xstat"); if (xs) xs.remove();
+    var ss = $("ssum"); if (ss) ss.textContent = "الحساب والمزامنة";
+    if (box) box.remove();
+    box = document.createElement("div"); box.style.cssText = "margin-top:6px";
+    var a = authGet(), row = document.createElement("div"); row.style.cssText = "display:flex;gap:8px;flex-wrap:wrap;margin-top:8px";
+    if (!READY) {
+      var nr = document.createElement("div"); nr.style.cssText = "font-size:14px;color:var(--mut)"; nr.textContent = "الحساب والمزامنة غير مفعّلين بعد (يلزم إضافة مفتاح Firebase).";
+      box.appendChild(nr);
+    } else if (a) {
+      var who = document.createElement("div"); who.style.cssText = "font-weight:800;font-size:17px"; who.textContent = "الحساب: " + a.u; box.appendChild(who);
+      var hint = document.createElement("div"); hint.style.cssText = "font-size:13px;color:var(--mut)"; hint.textContent = "تتم المزامنة تلقائياً عند الاتصال بالإنترنت.";
+      box.appendChild(hint);
+      row.appendChild(btn("مزامنة الآن", sync, true));
+      var off = btn("تسجيل الخروج", function () {
+        if (!off.dataset.arm) { off.dataset.arm = "1"; off.textContent = "اضغط للتأكيد"; setTimeout(function () { delete off.dataset.arm; off.textContent = "تسجيل الخروج"; }, 4000); return; }
+        logout(false);
+      });
+      off.style.color = "var(--danger)"; row.appendChild(off);
+    } else {
+      var info = document.createElement("div"); info.style.cssText = "font-size:14px;color:var(--mut)"; info.textContent = "لست مسجلاً. سجّل الدخول لمزامنة زبائنك بين الأجهزة.";
+      box.appendChild(info);
+      row.appendChild(btn("تسجيل الدخول / إنشاء حساب", function () { localStorage.removeItem(SKIP); overlay(); }, true));
+    }
+    box.appendChild(row);
+    stEl = document.createElement("div"); stEl.style.cssText = "margin-top:8px;font-size:14px";
+    var lt = parseInt(localStorage.getItem(LK) || "0", 10);
+    if (a && lt) stEl.textContent = "آخر مزامنة: " + hhmm(lt);
+    box.appendChild(stEl); sd.appendChild(box);
+  }
+
+  ui(); overlay();
+  lastSeen = localStorage.getItem(JK) || "";
+  if (READY && authGet()) sync();
+  window.addEventListener("online", function () { if (authGet()) schedule(); });
+  document.addEventListener("visibilitychange", function () { if (!document.hidden && authGet()) schedule(); });
+  setInterval(function () {
+    var s = localStorage.getItem(JK) || "";
+    if (s !== lastSeen) { lastSeen = s; if (authGet()) schedule(); }
+  }, 3000);
+})();
+
+</script>
 </body>
 </html>
