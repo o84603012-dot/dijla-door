@@ -729,7 +729,7 @@ function render(){
     g.appendChild(field("الارتفاع",d,"h",true,"h"+i));
     c.appendChild(g);
     if(kind==="doors"){c.appendChild(opts("الاتجاه",d,"dir",["يمين","يسار"]));c.appendChild(colField(d,i));c.appendChild(opts("العثرة",d,"thr",["عثرة","بدون"]))}else if(kind==="vents"){c.appendChild(opts("النوع",d,"mv",["متحرك","ثابت"]));c.appendChild(opts("المادة",d,"vm",["بلاستك","المنيوم مسح","المنيوم ايطالي"]));c.appendChild(colField(d,i))}else if(kind==="slide"){c.appendChild(opts("النوع",d,"typ",["خطين","ثلاث خطوط","ايطالي","مفصلي"]));c.appendChild(opts("الزجاج",d,"glz",["تك جام","دبل جام"]));c.appendChild(colField(d,i,SC))}else if(kind==="windows"){c.appendChild(colField(d,i));c.appendChild(opts("المبردة",d,"cool",["مبردة","بدون"]))}
-    if(kind==="windows"||kind==="slide"){c.appendChild(secTitle("رسم الشباك"));c.appendChild(drawField(d,i))}
+    if(kind==="windows"||kind==="slide"||kind==="doors"){c.appendChild(secTitle(kind==="doors"?"رسم الباب":"رسم الشباك"));c.appendChild(drawField(d,i))}
     c.appendChild(priceField(d,i));
     c.appendChild(field("ملاحظة",d,"note",false,"n"+i));
     box.appendChild(c);
@@ -867,6 +867,7 @@ async function drawReport(only,priced){
   if(!only){
     wimg.windows=await Promise.all((data.windows||[]).map(function(d){return loadIm(d.draw||((d.lbl&&d.lbl.length)?blankUrl():null))}));
     wimg.slide=await Promise.all((data.slide||[]).map(function(d){return loadIm(d.draw||((d.lbl&&d.lbl.length)?blankUrl():null))}));
+    wimg.doors=await Promise.all((data.doors||[]).map(function(d){return loadIm(d.draw||((d.lbl&&d.lbl.length)?blankUrl():null))}));
   }
   ["doors","windows","slide","vents"].forEach(function(k){
     if(only)return;
@@ -898,7 +899,7 @@ async function drawReport(only,priced){
     y+=16;if(y+60>H-M)np();
     var cc=calc(k);
     cx.font="700 28px"+FF;cx.textAlign="right";cx.fillText(K[k].cnt+": "+list.length+(AREAK[k]?" | المساحة: "+fmt(cc.a)+" م²":"")+(priced&&cc.has?" | المبلغ: "+usd(cc.amt):""),W-M,y);y+=70;
-    if(k==="windows"||k==="slide"){list.forEach(function(d,i){var im=(wimg[k]||[])[data[k].indexOf(d)];if(im)putImg("رسم "+K[k].s+" "+(d.loc||String(i+1))+":",im,d.lbl)})}
+    if(k==="windows"||k==="slide"||k==="doors"){list.forEach(function(d,i){var im=(wimg[k]||[])[data[k].indexOf(d)];if(im)putImg("رسم "+K[k].s+" "+(d.loc||String(i+1))+":",im,d.lbl)})}
   });
   var cl=only?[]:(data.counters||[]).filter(function(d){return d.note||kmUsed(d)||d.cm||d.gt||(d.lbl&&d.lbl.length)||CKEYS.some(function(q){return d[q]})});
   function blankUrl(){var c=document.createElement("canvas");c.width=1000;c.height=720;var q=c.getContext("2d");q.fillStyle="#fff";q.fillRect(0,0,1000,720);return c.toDataURL("image/jpeg",0.8)}
