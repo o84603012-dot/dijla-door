@@ -1186,19 +1186,20 @@ async function drawReport(only,priced){
     y+=16;if(y+60>H-M)np();
     list.forEach(function(d,i){if(exUsed(d))exLine(d,"إضافة على الحساب - "+(d.vn||d.loc||(K[k].s+" "+(i+1))))});if(y+60>H-M)np();var cc=calc(k);
     cx.font="700 28px"+FF;cx.textAlign="right";cx.fillText(K[k].cnt+": "+list.length+(AREAK[k]?" | المساحة: "+fmt(cc.a)+" م²":"")+(priced&&cc.has?" | المبلغ: "+tm2(cc.amt,cc.ami):""),W-M,y);y+=70;
-    if(k==="doors"||k==="windows"||k==="slide"){list.forEach(function(d,i){var im=(wimg[k]||[])[data[k].indexOf(d)];if(im)putImg("رسم "+K[k].s+" "+(d.loc||String(i+1))+":",im,d.lbl)})}
+    if(k==="doors"||k==="windows"||k==="slide"){list.forEach(function(d,i){var im=(wimg[k]||[])[data[k].indexOf(d)];if(im)putImg("رسم "+K[k].s+" "+(d.loc||String(i+1))+":",im,d.lbl,295)})}
   });
   var cl=only?[]:(data.counters||[]).filter(function(d){return d.note||exUsed(d)||dmUsed(d)||kmUsed(d)||d.cm||d.gt||(d.lbl&&d.lbl.length)||CKEYS.some(function(q){return d[q]})});
   function blankUrl(){var c=document.createElement("canvas");c.width=1000;c.height=720;var q=c.getContext("2d");q.fillStyle="#fff";q.fillRect(0,0,1000,720);return c.toDataURL("image/jpeg",0.8)}
   function loadIm(src){return src?new Promise(function(res){var im=new Image();im.onload=function(){res(im)};im.onerror=function(){res(null)};im.src=src}):Promise.resolve(null)}
   var pim=await Promise.all(cl.map(function(d){return loadIm(d.photo)})),pyd=await Promise.all(cl.map(function(d){return loadIm(d.ydp)})),pdr=await Promise.all(cl.map(function(d){return loadIm(d.draw||((d.lbl&&d.lbl.length)?blankUrl():null))}));
-  function putImg(title,im,lbl){
-    var mw=W-2*M,mh=900,r=Math.min(mw/im.naturalWidth,mh/im.naturalHeight,1.6),iw=Math.round(im.naturalWidth*r),ih=Math.round(im.naturalHeight*r);
+  function putImg(title,im,lbl,box){
+    var mw=W-2*M,mh=900;if(box){mw=box;mh=box}
+    var _u=0,r=Math.min(mw/im.naturalWidth,mh/im.naturalHeight,1.6),iw=Math.round(im.naturalWidth*r),ih=Math.round(im.naturalHeight*r);
     if(y+ih+60>H-M)np();
     cx.font="700 30px"+FF;cx.fillStyle="#000";cx.textAlign="right";cx.textBaseline="top";cx.fillText(title,W-M,y);y+=46;
     cx.drawImage(im,Math.round((W-iw)/2),y,iw,ih);cx.strokeStyle="#333";cx.lineWidth=2;cx.strokeRect(Math.round((W-iw)/2),y,iw,ih);
     if(lbl&&lbl.length){
-      var fz=Math.max(18,Math.round(iw*0.04)),x0=Math.round((W-iw)/2);
+      var fz=Math.max(box?8:18,Math.round(iw*0.04)),x0=Math.round((W-iw)/2);
       cx.font="700 "+fz+"px"+FF;cx.textBaseline="middle";cx.textAlign="center";
       lbl.forEach(function(lb){if(lb.k){cx.save();cx.beginPath();cx.rect(x0,y,iw,ih);cx.clip();cx.translate(x0+lb.x*iw,y+lb.y*ih);cx.rotate((lb.r||0)*Math.PI/180);cx.strokeStyle="#111";cx.lineWidth=Math.max(2,iw*0.005);var SL=(lb.w||0.3)*iw;if(lb.k==="line"){cx.beginPath();cx.moveTo(-SL/2,0);cx.lineTo(SL/2,0);cx.stroke()}else{cx.strokeRect(-SL/2,-SL/2,SL,SL)}cx.restore();return}var fl=Math.round(fz*(lb.z||1));cx.font="700 "+fl+"px"+FF;var px=x0+lb.x*iw,py=y+lb.y*ih,tw=cx.measureText(lb.t).width,bx=-tw/2-8,by=-fl*0.75,bw=tw+16,bh=fl*1.5;cx.save();cx.translate(px,py);cx.rotate((lb.r||0)*Math.PI/180);cx.fillStyle="rgba(255,255,255,0.92)";cx.fillRect(bx,by,bw,bh);cx.strokeStyle="#333";cx.lineWidth=2;cx.strokeRect(bx,by,bw,bh);cx.fillStyle="#000";cx.fillText(lb.t,0,0);cx.restore()});
       cx.textBaseline="top";cx.textAlign="right";
@@ -1371,7 +1372,15 @@ function uid(){return "j"+Date.now().toString(36)+Math.random().toString(36).sli
 if(!data.id){data.id=uid();save()}
 function fixData(){var b=blank();if(!data.c)data.c=b.c;if(!data.prices)data.prices={};["doors","windows","slide","vents","counters","mahjalat"].forEach(function(k){if(!data[k]||!data[k].length)data[k]=b[k]})}
 function loadInputs(){Object.keys(cmap).forEach(function(id){$(id).value=data.c[cmap[id]]||""})}
-function dirty(){var b=blank(),rp=function(k,v){if(!Array.isArray(v))return v;if(k==="ex"&&!v.some(function(e){return e&&(e.t||e.p)}))return undefined;if(k==="mx"&&!v.some(function(e){return e&&(e.n||e.v)}))return undefined;if(k==="dm"&&!v.some(function(e){return e&&e.v}))return undefined;return v},pick=function(x){return JSON.stringify({pr:Object.keys(x.prices||{}).filter(function(k){return String(x.prices[k]||"")}).sort().map(function(k){return k+":"+x.prices[k]}),c:x.c,doors:x.doors,windows:x.windows,slide:x.slide,vents:x.vents,counters:x.counters,mahjalat:x.mahjalat},rp)};return pick(data)!==pick(b)}
+function prune(v){
+  if(Array.isArray(v)){var a=v.map(prune).filter(function(x){return x!==undefined});return a.length?a:undefined}
+  if(v&&typeof v==="object"){var o={},n=0;Object.keys(v).forEach(function(k){if(k==="id"||k==="by"||k==="at")return;var r=prune(v[k]);if(r!==undefined){o[k]=r;n++}});return n?o:undefined}
+  if(typeof v==="string")return v.trim()===""?undefined:v;
+  if(typeof v==="number")return v;
+  if(v===true)return v;
+  return undefined;
+}
+function dirty(){return prune(data)!==undefined}
 function storeCurrent(){
   var n=(data.c.n||"").trim();if(!n)return false;if(!data.by){var cu=window.__dijlaUser&&window.__dijlaUser();if(cu)data.by=cu}
   var rec={id:data.id,name:n,at:Date.now(),d:JSON.parse(JSON.stringify(data))},i=jobs.findIndex(function(j){return j.id===data.id});
@@ -1430,7 +1439,7 @@ function renderJobs(){
 function openJob(id){
   var j=jobs.find(function(k){return k.id===id});if(!j)return;
   if(id===data.id){$("msg").textContent="هذا الزبون مفتوح الآن.";go("sections");return}
-  if(!storeCurrent()&&dirty()){$("msg").textContent="اكتب اسم الزبون الحالي لحفظ بياناته قبل فتح زبون آخر.";return}
+  if(!storeCurrent()&&dirty()){if(!confirm("بيانات الزبون الحالي بدون اسم ولن تُحفظ. هل تريد المتابعة وفتح الزبون المختار؟"))return}
   data=JSON.parse(JSON.stringify(j.d));data.id=j.id;fixData();save();loadInputs();render();
   $("msg").textContent="تم فتح "+j.name+". عدّل ثم اضغط حفظ للزبون.";go("sections");
   try{window.scrollTo(0,0)}catch(e){}
@@ -1441,7 +1450,7 @@ $("jsave").onclick=function(){
 };
 $("jnew").onclick=function(){
   var saved=storeCurrent();
-  if(!saved&&dirty()){$("msg").textContent="اكتب اسم الزبون الحالي لحفظ بياناته أولاً.";return}
+  if(!saved&&dirty()){if(!confirm("بيانات الزبون الحالي بدون اسم ولن تُحفظ. هل تريد المتابعة؟"))return}
   data=blank();data.id=uid();save();loadInputs();render();
   $("msg").textContent=saved?"تم حفظ الزبون السابق وفتح زبون جديد.":"زبون جديد.";
   try{window.scrollTo(0,0)}catch(e){}
