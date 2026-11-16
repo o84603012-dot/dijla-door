@@ -108,6 +108,21 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .jtt{width:100%;border-collapse:collapse;font-size:14px;min-width:560px}
 .jtt th,.jtt td{border:1.5px solid var(--line);padding:6px 8px;text-align:right;vertical-align:top}
 .jtt th{background:var(--sel);color:var(--selt)}
+.gn,.jtt td .gn,.job .jn b.gn{color:#0a7a2a!important}
+.nm{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.st-sent td,.job.st-sent{background:#d6e6ff!important}
+.st-partial td,.job.st-partial{background:#fff0a0!important}
+.st-done td,.job.st-done{background:#c6ecc8!important}
+.job.st-sent,.job.st-partial,.job.st-done{padding:10px;border-radius:12px}
+.sbs{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.sb{font:inherit;font-size:12px!important;font-weight:800;padding:2px 8px!important;border:1.5px solid var(--pen)!important;border-radius:12px;background:#fff!important;color:var(--pen)!important;text-decoration:none!important;white-space:nowrap}
+.sb.s-sent{border-color:#2457b5!important;color:#2457b5!important}.sb.s-sent[aria-pressed=true]{background:#2457b5!important;color:#fff!important}
+.sb.s-partial{border-color:#a67c00!important;color:#7a5c00!important}.sb.s-partial[aria-pressed=true]{background:#f2c400!important;color:#000!important}
+.sb.s-done{border-color:#0a7a2a!important;color:#0a7a2a!important}.sb.s-done[aria-pressed=true]{background:#0a7a2a!important;color:#fff!important}
+.dn{font:inherit;font-size:12px!important;font-weight:800;padding:2px 8px!important;border:1.5px solid #0a7a2a!important;border-radius:12px;background:#fff!important;color:#0a7a2a!important;text-decoration:none!important;white-space:nowrap}
+.dn[aria-pressed=true]{background:#0a7a2a!important;color:#fff!important}
+#remind{margin:0 0 12px;padding:10px 14px;border:1.5px solid #e0a800;border-radius:18px;background:#fff6d6;font-weight:700;font-size:14px}
+#remind[hidden]{display:none}
 .jtt td button{font:inherit;font-weight:800;background:none;border:0;color:var(--pen);text-decoration:underline;cursor:pointer;padding:0;text-align:right}
 .topbar{display:flex;align-items:center;gap:8px;margin-bottom:8px}
 .topbar .brand{flex:1;margin:0;font-size:20px;text-align:center}
@@ -132,6 +147,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <div class="topbar"><button type="button" class="tb" id="backBtn" hidden>&rarr; الرئيسية</button><h1 class="brand" id="brand">قياسات معرض دجلة</h1><button type="button" class="tb" id="userBtn" aria-label="الحساب وتسجيل الدخول"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span id="userTxt">دخول</span></button></div>
 
 <section data-scr="home" id="scr-home">
+<div id="remind" hidden role="status"></div>
 <div class="menu">
 <button type="button" class="menu-new" id="mnew"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>إضافة قياس جديد</span></button>
 <button type="button" id="mcust"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.3c2.8.2 5 2.4 5 5.7"/></svg><span>الزبائن <span id="mcnt"></span></span></button>
@@ -1097,7 +1113,7 @@ async function drawReport(only,priced){
     y+=6;
   }
   var COL={"أبيض":["#ffffff","#000"],"صاج":["#5c3a21","#fff"],"بلوطي":["#8a5a2e","#fff"],"أسود":["#111111","#fff"],"اسود لماع":["#050505","#fff"],"اسود فحمي":["#2a2a2a","#fff"],"انترسات":["#4b5158","#fff"],"شمباني":["#e3cfa0","#000"],"كريمي":["#f5edd6","#000"]};
-  function row(vals,fr,bold,ci,nohl){
+  function row(vals,fr,bold,ci,nohl,grn){
     var tw=W-2*M,LH=38,FNT=(bold?"700 ":"700 ")+"28px"+FF;
     cx.font=FNT;
     var cells=vals.map(function(v,i){return wrapText(v,tw*fr[i]-20)});
@@ -1110,6 +1126,7 @@ async function drawReport(only,priced){
         if(bold||hl){cx.fillStyle=hl?(bold?"#b9e5bd":"#dff3e0"):"#eee";cx.fillRect(x-cw,y,cw,rh)}
         else if(i===ci&&COL[v]){cx.fillStyle=COL[v][0];cx.fillRect(x-cw,y,cw,rh);fg=COL[v][1]}
         cx.strokeStyle="#333";cx.lineWidth=2;cx.strokeRect(x-cw,y,cw,rh);
+        if(grn&&i===0&&!bold){cx.fillStyle=grn[0];cx.fillRect(x-cw+2,y+2,cw-4,rh-4);cx.strokeStyle="#333";cx.strokeRect(x-cw,y,cw,rh);fg=grn[1]}
         cx.fillStyle=fg;
         cs[i].forEach(function(ln,k){cx.fillText(ln,x-10,y+14+k*LH)});x-=cw;
       });
@@ -1133,7 +1150,7 @@ async function drawReport(only,priced){
   np();
   cx.textAlign="center";cx.font="700 46px"+FF;cx.fillText(only==="tbl"?"جدول الزبائن - معرض دجلة":only==="all"?"قائمة تجهيز المواد - معرض دجلة":only==="counters"?"قائمة مواد المطبخ - معرض دجلة":only==="dw"?"قائمة مواد الأبواب والشبابيك البلاستك - معرض دجلة":only?"قائمة تجهيز المحجلات - معرض دجلة":priced?"قياسات معرض دجلة - نسخة الشركة (بالأسعار)":"قياسات معرض دجلة - نسخة الورشة",W/2,y);y+=84;
   cx.textAlign="right";cx.font="700 30px"+FF;
-  if(only!=="tbl")[["الزبون",data.c.n],["العنوان",data.c.a],["الهاتف",data.c.p],["موعد التركيب",data.c.d]].concat(data.by?[["أخذ القياس",data.by]]:[]).forEach(function(x){cx.fillText(x[0]+": "+(x[1]||"-"),W-M,y);y+=48});
+  if(only!=="tbl")[["الزبون",data.c.n],["العنوان",data.c.a],["الهاتف",data.c.p],["موعد التركيب",data.c.d]].concat(data.by?[["أخذ القياس",data.by]]:[]).forEach(function(x){var tx=x[0]+": "+(x[1]||"-"),sf=null;if(x[0]==="الزبون"){var so=stOf(data);sf=so?STF[so]:(instGreen(data)?["#dff3e0","#0a7a2a"]:null);if(so)tx+="   ["+STL[so]+"]"}if(sf){var tw2=cx.measureText(tx).width;cx.fillStyle=sf[0];cx.fillRect(W-M-tw2-12,y-6,tw2+24,50)}cx.fillStyle=sf?sf[1]:"#000";cx.fillText(tx,W-M,y);cx.fillStyle="#000";y+=48});
   if(only==="tbl"){cx.fillText("التاريخ: "+new Date().toLocaleDateString("en-GB"),W-M,y);y+=48}
   else if(only){cx.fillText("التاريخ: "+new Date().toLocaleDateString("en-GB"),W-M,y);y+=48;cx.fillText("المجهز: ______________________",W-M,y);y+=48}
   y+=24;
@@ -1141,7 +1158,7 @@ async function drawReport(only,priced){
     var hvT=["الزبون","الهاتف","العنوان","موعد التركيب","التفاصيل","أخذ القياس"],frT=[0.17,0.13,0.18,0.13,0.26,0.13],rowsTb=tblRows();
     if(!rowsTb.length){cx.font="700 30px"+FF;cx.fillText("لا يوجد زبائن محفوظون.",W-M,y);return pages}
     head={v:hvT,f:frT,n:1};row(hvT,frT,true,undefined,1);
-    rowsTb.forEach(function(r){row([r.n,r.p||"-",r.a||"-",r.dt||"-",r.det||"-",r.by||"-"],frT,false,undefined,1)});
+    rowsTb.forEach(function(r){row([r.n,r.p||"-",r.a||"-",r.dt||"-",r.det||"-",r.by||"-"],frT,false,undefined,1,r.st?STF[r.st]:(r.grn?["#dff3e0","#0a7a2a"]:null))});
     head=null;return pages;
   }
   var wimg={};
@@ -1398,15 +1415,35 @@ function detText(d){
   });
   return p.join("، ");
 }
+function isoToday(){var t=new Date();return t.getFullYear()+"-"+("0"+(t.getMonth()+1)).slice(-2)+"-"+("0"+t.getDate()).slice(-2)}
+function dayDiff(iso){if(!/^\d{4}-\d\d-\d\d$/.test(iso||""))return null;var a=new Date(iso+"T00:00:00"),b=new Date(isoToday()+"T00:00:00");return Math.round((a-b)/864e5)}
+function instGreen(d){if(!d)return false;if(d.done)return true;var k=dayDiff(d.c&&d.c.d);return k!==null&&k<=-1}
+function stOf(d){return d?(d.done?"done":(d.st||"")):""}
+function addedTs(j){var m=/^j([0-9a-z]{8})[0-9a-z]{4}$/.exec(j.id||"");var t=m?parseInt(m[1],36):0;return t>1e12?t:(j.at||0)}
+var STL={sent:"تم الإرسال إلى الورشة",partial:"اكتمل، باقي تركيب",done:"اكتمل التركيب"};
+var STF={sent:["#d6e6ff","#000"],partial:["#fff0a0","#000"],done:["#c6ecc8","#0a7a2a"]};
 function tblRows(){
-  var arr=(jobs||[]).map(function(j){return {id:j.id,d:j.d,name:j.name}});
+  var arr=(jobs||[]).map(function(j){return {id:j.id,d:j.d,name:j.name,at:j.at}});
   if(data&&data.c&&(data.c.n||"").trim()){
-    var i=arr.findIndex(function(j){return j.id===data.id}),rec={id:data.id,d:data,name:data.c.n.trim()};
+    var i=arr.findIndex(function(j){return j.id===data.id}),rec={id:data.id,d:data,name:data.c.n.trim(),at:Date.now()};
     if(i>=0)arr[i]=rec;else arr.push(rec);
   }
-  var rows=arr.map(function(j){var c=(j.d&&j.d.c)||{};if(j.d===data&&!data.by){var cu0=window.__dijlaUser&&window.__dijlaUser();if(cu0)j={id:j.id,d:Object.assign({},data,{by:cu0}),name:j.name}}return {id:j.id,n:c.n||j.name||"-",p:c.p||"",a:c.a||"",dt:(c.d||"").replace(/-/g,"/"),det:detText(j.d),by:(j.d&&j.d.by)||""}});
-  rows.sort(function(a,b){if(a.dt&&b.dt)return a.dt<b.dt?-1:(a.dt>b.dt?1:0);if(a.dt)return -1;if(b.dt)return 1;return String(a.n).localeCompare(String(b.n),"ar")});
+  var rows=arr.map(function(j){var c=(j.d&&j.d.c)||{};if(j.d===data&&!data.by){var cu0=window.__dijlaUser&&window.__dijlaUser();if(cu0)j={id:j.id,d:Object.assign({},data,{by:cu0}),name:j.name,at:j.at}}return {id:j.id,n:c.n||j.name||"-",p:c.p||"",a:c.a||"",dt:(c.d||"").replace(/-/g,"/"),iso:c.d||"",det:detText(j.d),by:(j.d&&j.d.by)||"",done:!!(j.d&&j.d.done),st:stOf(j.d),grn:instGreen(j.d),ts:addedTs(j)}});
+  rows.sort(function(a,b){return b.ts-a.ts});
   return rows;
+}
+function setSt(id,v){
+  function ap(d){if(v){d.st=v}else delete d.st;if(v==="done")d.done=true;else delete d.done}
+  if(id===data.id){ap(data);if(!storeCurrent())save();else save()}
+  else{var j=jobs.find(function(k){return k.id===id});if(!j)return;ap(j.d);j.at=Date.now();saveJobs()}
+  renderJobs();if(!$("scr-search").hidden)renderSearch();checkReminders(true);
+}
+function stBtns(r){
+  var w=document.createElement("div");w.className="sbs";
+  ["sent","partial","done"].forEach(function(k){
+    var b=document.createElement("button");b.type="button";b.className="sb s-"+k;b.textContent=STL[k];b.setAttribute("aria-pressed",String(r.st===k));
+    b.onclick=function(e){e.stopPropagation();setSt(r.id,r.st===k?"":k)};w.appendChild(b);
+  });return w;
 }
 function renderTable(){
   var tb=$("jtb");if(!tb)return;
@@ -1414,7 +1451,7 @@ function renderTable(){
   if(!rows.length){var tr0=document.createElement("tr"),td0=document.createElement("td");td0.colSpan=6;td0.textContent="لا يوجد زبائن محفوظون بعد.";tr0.appendChild(td0);tb.appendChild(tr0);return}
   rows.forEach(function(r){
     var tr=document.createElement("tr"),t0=document.createElement("td"),b=document.createElement("button");
-    b.type="button";b.textContent=r.n;b.onclick=function(){openJob(r.id)};t0.appendChild(b);tr.appendChild(t0);
+    b.type="button";b.textContent=r.n;if(r.grn)b.className="gn";b.onclick=function(){openJob(r.id)};if(r.st)tr.className="st-"+r.st;t0.appendChild(b);t0.appendChild(stBtns(r));tr.appendChild(t0);
     [r.p,r.a,r.dt,r.det,r.by].forEach(function(v,q){var td=document.createElement("td");td.textContent=v||"-";if(q===0)td.dir="ltr";tr.appendChild(td)});
     tb.appendChild(tr);
   });
@@ -1424,8 +1461,8 @@ function renderJobs(){
   var L=$("jl");L.innerHTML="";$("jsum").textContent="الزبائن المحفوظون ("+jobs.length+")";
   if(!jobs.length){L.appendChild(mk("div","jempty","لا يوجد زبائن محفوظون بعد."));return}
   jobs.forEach(function(j){
-    var r=mk("div","job"),n=mk("div","jn"),dt=new Date(j.at);
-    n.appendChild(mk("b",null,j.name));
+    var r=mk("div","job"+(stOf(j.d)?" st-"+stOf(j.d):"")),n=mk("div","jn"),dt=new Date(j.at);
+    n.appendChild(mk("b",instGreen(j.d)?"gn":null,j.name));
     n.appendChild(mk("span",null,(j.d.c&&j.d.c.p?j.d.c.p+" | ":"")+(j.d.by?"أخذ القياس: "+j.d.by+" | ":"")+"آخر حفظ: "+dt.getFullYear()+"/"+(dt.getMonth()+1)+"/"+dt.getDate()));
     var o=mk("button",null,"فتح");o.type="button";o.onclick=function(){openJob(j.id)};
     var x=mk("button","del","حذف");x.type="button";
@@ -1571,13 +1608,35 @@ function renderSearch(){
   if(!rows.length){L.appendChild(mk("div","jempty",q?"لا توجد نتائج.":"لا يوجد زبائن محفوظون بعد."));return}
   rows.forEach(function(r){
     var c=mk("div","job"),n=mk("div","jn"),o=mk("button",null,"فتح");
-    n.appendChild(mk("b",null,r.n));
+    n.appendChild(mk("b",r.grn?"gn":null,r.n));
     n.appendChild(mk("span",null,[r.p,r.a,r.dt,r.det,r.by?"أخذ القياس: "+r.by:""].filter(Boolean).join(" | ")));
     o.type="button";o.onclick=function(){openJob(r.id)};
-    c.appendChild(n);c.appendChild(o);L.appendChild(c);
+    n.appendChild(stBtns(r));if(r.st)c.className+=" st-"+r.st;c.appendChild(n);c.appendChild(o);L.appendChild(c);
   });
 }
 $("sq").addEventListener("input",renderSearch);
+var NK="dijla-notified";
+function notified(){try{return JSON.parse(localStorage.getItem(NK)||"{}")||{}}catch(e){return {}}}
+function pushNote(title,body,tag){
+  try{if(!("Notification" in window)||Notification.permission!=="granted")return false;
+    if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(function(rg){if(rg&&rg.showNotification)rg.showNotification(title,{body:body,tag:tag,lang:"ar",dir:"rtl"});else new Notification(title,{body:body,tag:tag})}).catch(function(){try{new Notification(title,{body:body,tag:tag})}catch(e){}})}
+    else new Notification(title,{body:body,tag:tag});return true}catch(e){return false}
+}
+function checkReminders(quiet){
+  var rows=tblRows().filter(function(r){return !r.done&&!r.grn&&r.iso}),due=[];
+  rows.forEach(function(r){var k=dayDiff(r.iso);if(k===1||k===0)due.push({r:r,k:k})});
+  var bx=$("remind");
+  if(bx){if(due.length){bx.hidden=false;bx.textContent="🔔 مواعيد التركيب القريبة: "+due.map(function(x){return x.r.n+(x.k===0?" (اليوم)":" (غداً)")}).join("، ")}else{bx.hidden=true;bx.textContent=""}}
+  if(quiet)return;
+  var nf=notified(),ch=false;
+  due.forEach(function(x){var key=x.r.id+"|"+x.r.iso;if(nf[key])return;
+    if(pushNote("تذكير موعد تركيب",x.r.n+(x.k===1?" — موعد تركيبه غداً":" — موعد تركيبه اليوم"),key)){nf[key]=1;ch=true}});
+  if(ch){try{localStorage.setItem(NK,JSON.stringify(nf))}catch(e){}}
+}
+document.addEventListener("click",function ask(){try{if("Notification" in window&&Notification.permission==="default")Notification.requestPermission().then(function(){checkReminders()})}catch(e){}document.removeEventListener("click",ask)});
+document.addEventListener("visibilitychange",function(){if(!document.hidden){renderTable();checkReminders()}});
+setInterval(function(){checkReminders()},60000);
+setTimeout(function(){checkReminders()},800);
 $("backBtn").onclick=function(){go("home")};
 $("mnew").onclick=function(){go("newm")};
 document.querySelectorAll("[data-nk]").forEach(function(b){b.onclick=function(){$("jnew").onclick();setKind(b.dataset.nk);go("sections")}});
