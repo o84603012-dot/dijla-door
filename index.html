@@ -118,6 +118,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .sb{font:inherit;font-size:12px!important;font-weight:800;padding:2px 8px!important;border:1.5px solid var(--pen)!important;border-radius:12px;background:#fff!important;color:var(--pen)!important;text-decoration:none!important;white-space:nowrap}
 .sb.s-sent{border-color:#2457b5!important;color:#2457b5!important}.sb.s-sent[aria-pressed=true]{background:#2457b5!important;color:#fff!important}
 .sb.s-partial{border-color:#a67c00!important;color:#7a5c00!important}.sb.s-partial[aria-pressed=true]{background:#f2c400!important;color:#000!important}
+.sb.s-del{border-color:#c0392b!important;color:#c0392b!important}
 .sb.s-done{border-color:#0a7a2a!important;color:#0a7a2a!important}.sb.s-done[aria-pressed=true]{background:#0a7a2a!important;color:#fff!important}
 .dn{font:inherit;font-size:12px!important;font-weight:800;padding:2px 8px!important;border:1.5px solid #0a7a2a!important;border-radius:12px;background:#fff!important;color:#0a7a2a!important;text-decoration:none!important;white-space:nowrap}
 .dn[aria-pressed=true]{background:#0a7a2a!important;color:#fff!important}
@@ -132,7 +133,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 .menu button{font:inherit;font-weight:800;font-size:18px;padding:22px 10px;border:1.5px solid var(--line);border-radius:22px;background:var(--card);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:8px}
 .menu button svg,.tb svg{flex:none}
 .menu button:last-child:nth-child(odd){grid-column:1/-1}
-#msync{grid-column:auto}
+#msync,#mnote{grid-column:auto}
 .menu .menu-new{grid-column:1/-1;background:var(--sel);color:var(--selt);border-color:transparent;font-size:20px;padding:26px 10px}
 .scr-h{font-size:22px;margin:6px 0 10px;text-align:center}
 .hlogo{display:block;width:84px;height:84px;border-radius:20px;margin:10px auto 0}
@@ -154,6 +155,8 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <button type="button" id="msearch"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span>البحث عن زبون</span></button>
 <button type="button" id="mmat"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></svg><span>المواد</span></button>
 <button type="button" id="msync"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4.5L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4.5L20 15"/><path d="M20 20v-5h-5"/></svg><span>المزامنة</span></button>
+<button type="button" id="mmeas"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg><span>القياسات (<span id="mmcnt">0</span>)</span></button>
+<button type="button" id="mnote"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9a6 6 0 0 1 12 0c0 6 2 7 2 7H4s2-1 2-7z"/><path d="M10 20a2 2 0 0 0 4 0"/></svg><span>الإشعارات (<span id="mncnt">0</span>)</span></button>
 </div>
 </section>
 
@@ -184,6 +187,17 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:6px"><button type="button" id="xexp" style="font:inherit;font-weight:800;padding:10px 16px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer;display:inline-block">تصدير الزبائن</button><label for="ximf" style="font:inherit;font-weight:800;padding:10px 16px;border:2px solid var(--pen);border-radius:4px;background:var(--card);color:var(--pen);cursor:pointer;display:inline-block">استيراد الزبائن</label><input type="file" id="ximf" style="display:none"></div>
 <div id="xstat" style="margin-top:8px;font-size:14px"></div>
 </details>
+</section>
+
+<section data-scr="meas" id="scr-meas" hidden>
+<h2 class="scr-h">القياسات المطلوبة</h2>
+<div class="jobs"><b>إضافة زبون يحتاج أخذ قياس</b>
+<input id="mn" class="sq" type="text" placeholder="اسم الزبون" aria-label="اسم الزبون" style="margin-top:8px">
+<input id="mp" class="sq" type="tel" placeholder="الهاتف (اختياري)" aria-label="الهاتف" style="margin-top:8px">
+<input id="ma" class="sq" type="text" placeholder="العنوان (اختياري)" aria-label="العنوان" style="margin-top:8px">
+<div style="margin-top:8px"><button type="button" class="jb" id="madd">إضافة إلى القياسات</button></div>
+<div id="mstat" style="font-size:14px;margin-top:6px" role="status"></div></div>
+<div id="mlist"></div>
 </section>
 
 <section data-scr="search" id="scr-search" hidden>
@@ -1010,7 +1024,7 @@ function render(){
     g.appendChild(field("الارتفاع",d,"h",true,"h"+i));
     c.appendChild(g);
     if(kind==="doors"||kind==="windows"||kind==="slide")c.appendChild(mxField(d));
-    if(kind==="doors"){c.appendChild(opts("الاتجاه",d,"dir",["يمين","يسار"]));c.appendChild(colField(d,i));c.appendChild(opts("العثرة",d,"thr",["عثرة","بدون"]))}else if(kind==="vents"){c.appendChild(opts("النوع",d,"mv",["متحرك","ثابت"]));c.appendChild(opts("المادة",d,"vm",["بلاستك","المنيوم مسح","المنيوم ايطالي"]));c.appendChild(colField(d,i))}else if(kind==="slide"){c.appendChild(opts("النوع",d,"typ",["خطين","ثلاث خطوط","ايطالي","مفصلي"]));c.appendChild(opts("الزجاج",d,"glz",["تك جام","دبل جام"]));c.appendChild(colField(d,i,SC))}else if(kind==="windows"){c.appendChild(colField(d,i));c.appendChild(opts("المبردة",d,"cool",["مبردة","بدون"]))}
+    if(kind==="doors"){c.appendChild(opts("الاتجاه",d,"dir",["يمين","يسار"]));c.appendChild(opts("العثرة",d,"thr",["عثرة","بدون"]));c.appendChild(colField(d,i))}else if(kind==="vents"){c.appendChild(opts("النوع",d,"mv",["متحرك","ثابت"]));c.appendChild(opts("المادة",d,"vm",["بلاستك","المنيوم مسح","المنيوم ايطالي"]));c.appendChild(colField(d,i))}else if(kind==="slide"){c.appendChild(opts("النوع",d,"typ",["خطين","ثلاث خطوط","ايطالي","مفصلي"]));c.appendChild(opts("الزجاج",d,"glz",["تك جام","دبل جام"]));c.appendChild(colField(d,i,SC))}else if(kind==="windows"){c.appendChild(colField(d,i));c.appendChild(opts("المبردة",d,"cool",["مبردة","بدون"]))}
     if(kind==="doors"||kind==="windows"||kind==="slide"){c.appendChild(secTitle(kind==="doors"?"رسم الباب":"رسم الشباك"));c.appendChild(drawField(d,i))}
     c.appendChild(priceField(d,i));c.appendChild(extrasField(d,i));
     c.appendChild(field("ملاحظة",d,"note",false,"n"+i));
@@ -1438,12 +1452,23 @@ function setSt(id,v){
   else{var j=jobs.find(function(k){return k.id===id});if(!j)return;ap(j.d);j.at=Date.now();saveJobs()}
   renderJobs();if(!$("scr-search").hidden)renderSearch();checkReminders(true);
 }
+function delJob(id){
+  jobs=jobs.filter(function(k){return k.id!==id});
+  if(id===data.id){data=blank();data.id=uid();save();loadInputs();render()}
+  saveJobs();renderJobs();
+  if(!$("scr-search").hidden)renderSearch();
+  if($("scr-meas")&&!$("scr-meas").hidden)renderMeas();
+  checkReminders(true);$("msg").textContent="تم حذف الزبون";
+}
 function stBtns(r){
   var w=document.createElement("div");w.className="sbs";
   ["sent","partial","done"].forEach(function(k){
     var b=document.createElement("button");b.type="button";b.className="sb s-"+k;b.textContent=STL[k];b.setAttribute("aria-pressed",String(r.st===k));
     b.onclick=function(e){e.stopPropagation();setSt(r.id,r.st===k?"":k)};w.appendChild(b);
-  });return w;
+  });
+  var x=document.createElement("button");x.type="button";x.className="sb s-del";x.textContent="حذف الزبون";
+  x.onclick=function(e){e.stopPropagation();if(x.dataset.arm){delJob(r.id)}else{x.dataset.arm="1";x.textContent="تأكيد الحذف؟";setTimeout(function(){delete x.dataset.arm;x.textContent="حذف الزبون"},4000)}};
+  w.appendChild(x);return w;
 }
 function renderTable(){
   var tb=$("jtb");if(!tb)return;
@@ -1457,7 +1482,7 @@ function renderTable(){
   });
 }
 function renderJobs(){
-  renderTable();
+  renderTable();updMeasCnt();if(typeof updNoteCnt==="function")updNoteCnt();
   var L=$("jl");L.innerHTML="";$("jsum").textContent="الزبائن المحفوظون ("+jobs.length+")";
   if(!jobs.length){L.appendChild(mk("div","jempty","لا يوجد زبائن محفوظون بعد."));return}
   jobs.forEach(function(j){
@@ -1599,8 +1624,34 @@ function go(n){
   $("backBtn").hidden=(n==="home");
   if(n==="customers")renderTable();
   if(n==="search")renderSearch();
+  if(n==="meas")renderMeas();
   try{window.scrollTo(0,0)}catch(e){}
 }
+function measJobs(){return jobs.filter(function(j){return j.d&&j.d.need})}
+function updMeasCnt(){var e=$("mmcnt");if(e)e.textContent=measJobs().length}
+function renderMeas(){
+  var L=$("mlist");L.innerHTML="";updMeasCnt();
+  var l=measJobs().sort(function(a,b){return addedTs(b)-addedTs(a)});
+  if(!l.length){L.appendChild(mk("div","jempty","لا يوجد زبائن بانتظار أخذ القياس."));return}
+  l.forEach(function(j){
+    var c=mk("div","job"),n=mk("div","jn"),cc=j.d.c||{};
+    n.appendChild(mk("b",null,j.name));
+    n.appendChild(mk("span",null,[cc.p,cc.a,cc.d].filter(Boolean).join(" | ")));
+    var o=mk("button",null,"أخذ القياس");o.type="button";o.onclick=function(){openJob(j.id)};
+    var dn=mk("button",null,"تم أخذ القياس");dn.type="button";dn.onclick=function(){delete j.d.need;j.at=Date.now();saveJobs();renderJobs();renderMeas()};
+    var x=mk("button","del","حذف");x.type="button";
+    x.onclick=function(){if(x.dataset.arm){jobs=jobs.filter(function(k){return k.id!==j.id});saveJobs();renderJobs();renderMeas()}else{x.dataset.arm="1";x.textContent="تأكيد؟";setTimeout(function(){delete x.dataset.arm;x.textContent="حذف"},4000)}};
+    c.appendChild(n);c.appendChild(o);c.appendChild(dn);c.appendChild(x);L.appendChild(c);
+  });
+}
+$("madd").onclick=function(){
+  var n=$("mn").value.trim();if(!n){$("mstat").textContent="اكتب اسم الزبون أولاً.";return}
+  var id=uid(),d=blank();d.id=id;d.c.n=n;d.c.p=$("mp").value.trim();d.c.a=$("ma").value.trim();d.need=true;
+  var cu=window.__dijlaUser&&window.__dijlaUser();if(cu)d.by=cu;
+  jobs.unshift({id:id,name:n,at:Date.now(),d:d});saveJobs();renderJobs();
+  $("mn").value="";$("mp").value="";$("ma").value="";$("mstat").textContent="تمت إضافة "+n+" إلى القياسات.";renderMeas();
+};
+$("mmeas").onclick=function(){go("meas")};
 function renderSearch(){
   var q=($("sq").value||"").trim().toLowerCase(),L=$("sres");
   var rows=tblRows().filter(function(r){return !q||[r.n,r.p,r.a,r.by,r.det,r.dt].join(" ").toLowerCase().indexOf(q)>=0});
@@ -1622,21 +1673,50 @@ function pushNote(title,body,tag){
     if(navigator.serviceWorker&&navigator.serviceWorker.getRegistration){navigator.serviceWorker.getRegistration().then(function(rg){if(rg&&rg.showNotification)rg.showNotification(title,{body:body,tag:tag,lang:"ar",dir:"rtl"});else new Notification(title,{body:body,tag:tag})}).catch(function(){try{new Notification(title,{body:body,tag:tag})}catch(e){}})}
     else new Notification(title,{body:body,tag:tag});return true}catch(e){return false}
 }
+function allNotes(){
+  var a=[],rs=tblRows();
+  rs.forEach(function(r){if(r.done||!r.iso)return;var k=dayDiff(r.iso);
+    if(k===0)a.push({o:0,id:r.id,n:r.n,t:"موعد تركيبه اليوم"});
+    else if(k===1)a.push({o:1,id:r.id,n:r.n,t:"موعد تركيبه غداً ("+r.dt+")"});
+    else if(k!==null&&k<0)a.push({o:2,id:r.id,n:r.n,t:"فات موعد تركيبه ("+r.dt+") ولم يُسجَّل اكتمال التركيب"})});
+  measJobs().forEach(function(j){a.push({o:3,id:j.id,n:j.name,t:"بانتظار أخذ القياس"})});
+  return a.sort(function(x,y){return x.o-y.o});
+}
+function updNoteCnt(){var e=$("mncnt");if(e)e.textContent=allNotes().length}
+function renderRemind(){
+  var bx=$("remind"),a=allNotes(),perm=("Notification" in window)?Notification.permission:"unsupported";
+  bx.innerHTML="";bx.style.whiteSpace="normal";
+  bx.appendChild(mk("div",null,"🔔 الإشعارات ("+a.length+")"));
+  if(!a.length)bx.appendChild(mk("div","jempty","لا توجد إشعارات حالياً."));
+  a.forEach(function(x){
+    var c=mk("div","job"),n=mk("div","jn"),o=mk("button",null,"فتح");o.type="button";
+    n.appendChild(mk("b",null,x.n));n.appendChild(mk("span",null,x.t));
+    o.onclick=function(){if(x.o===3)go("meas");else openJob(x.id)};
+    c.appendChild(n);c.appendChild(o);bx.appendChild(c);
+  });
+  var m=perm==="denied"?"الإشعارات المنبثقة محظورة من إعدادات المتصفح لهذا الموقع.":perm==="unsupported"?"هذا المتصفح لا يدعم الإشعارات المنبثقة.":perm==="default"?"لم يتم تفعيل الإشعارات المنبثقة بعد.":"الإشعارات المنبثقة مفعّلة: يصلك إشعار قبل الموعد بيوم.";
+  bx.appendChild(mk("div",null,m)).style.cssText="font-size:13px;font-weight:600;margin-top:6px";
+}
 function checkReminders(quiet){
   var rows=tblRows().filter(function(r){return !r.done&&!r.grn&&r.iso}),due=[];
   rows.forEach(function(r){var k=dayDiff(r.iso);if(k===1||k===0)due.push({r:r,k:k})});
-  var bx=$("remind");
-  if(bx){if(due.length){bx.hidden=false;bx.textContent="🔔 مواعيد التركيب القريبة: "+due.map(function(x){return x.r.n+(x.k===0?" (اليوم)":" (غداً)")}).join("، ")}else{bx.hidden=true;bx.textContent=""}}
+  window.__due=due;updNoteCnt();if(!$("remind").hidden)renderRemind();
   if(quiet)return;
   var nf=notified(),ch=false;
   due.forEach(function(x){var key=x.r.id+"|"+x.r.iso;if(nf[key])return;
     if(pushNote("تذكير موعد تركيب",x.r.n+(x.k===1?" — موعد تركيبه غداً":" — موعد تركيبه اليوم"),key)){nf[key]=1;ch=true}});
   if(ch){try{localStorage.setItem(NK,JSON.stringify(nf))}catch(e){}}
 }
-document.addEventListener("click",function ask(){try{if("Notification" in window&&Notification.permission==="default")Notification.requestPermission().then(function(){checkReminders()})}catch(e){}document.removeEventListener("click",ask)});
 document.addEventListener("visibilitychange",function(){if(!document.hidden){renderTable();checkReminders()}});
 setInterval(function(){checkReminders()},60000);
 setTimeout(function(){checkReminders()},800);
+$("mnote").onclick=function(){
+  var bx=$("remind");
+  function show(){checkReminders(true);bx.hidden=false;renderRemind()}
+  if(!bx.hidden){bx.hidden=true;return}
+  try{if("Notification" in window&&Notification.permission==="default"){Notification.requestPermission().then(function(){show();checkReminders()},show);return}}catch(e){}
+  show();checkReminders();
+};
 $("backBtn").onclick=function(){go("home")};
 $("mnew").onclick=function(){go("newm")};
 document.querySelectorAll("[data-nk]").forEach(function(b){b.onclick=function(){$("jnew").onclick();setKind(b.dataset.nk);go("sections")}});
