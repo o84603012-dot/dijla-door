@@ -1398,7 +1398,13 @@ $("pdfa").onclick=function(){return doPdf("all")};
 $("jtpdf").onclick=function(){return doPdf("tbl")};
 var JK="dijla-jobs",jobs=[];
 try{jobs=JSON.parse(localStorage.getItem(JK)||"[]")||[]}catch(e){jobs=[]}
-function saveJobs(){try{localStorage.setItem(JK,JSON.stringify(jobs))}catch(e){$("msg").textContent="تعذر حفظ الزبائن على هذا الجهاز."}}
+function saveJobs(){try{
+  var st=[];try{st=JSON.parse(localStorage.getItem(JK)||"[]")||[]}catch(e){}
+  st.forEach(function(c){var k=jobs.findIndex(function(j){return j.id===c.id});if(k<0)jobs.push(c);else if((c.at||0)>(jobs[k].at||0))jobs[k]=c});
+  localStorage.setItem(JK,JSON.stringify(jobs))}catch(e){$("msg").textContent="تعذر حفظ الزبائن على هذا الجهاز."}}
+var curBase="";
+function snap(d){try{return JSON.stringify(prune(d)||null)}catch(e){return ""}}
+function baseSnap(){curBase=snap(data)}
 function uid(){return "j"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 if(!data.id){data.id=uid();save()}
 function fixData(){var b=blank();if(!data.c)data.c=b.c;if(!data.prices)data.prices={};["doors","windows","slide","vents","counters","mahjalat"].forEach(function(k){if(!data[k]||!data[k].length)data[k]=b[k]})}
@@ -1414,9 +1420,11 @@ function prune(v){
 function dirty(){return prune(data)!==undefined}
 function storeCurrent(){
   var n=(data.c.n||"").trim();if(!n)return false;if(!data.by){var cu=window.__dijlaUser&&window.__dijlaUser();if(cu)data.by=cu}
-  var rec={id:data.id,name:n,at:Date.now(),d:JSON.parse(JSON.stringify(data))},i=jobs.findIndex(function(j){return j.id===data.id});
+  var i=jobs.findIndex(function(j){return j.id===data.id});
+  if(i>=0&&curBase&&snap(data)===curBase)return true;
+  var rec={id:data.id,name:n,at:Math.max(Date.now(),i>=0?(jobs[i].at||0)+1:0),d:JSON.parse(JSON.stringify(data))};
   if(i>=0)jobs[i]=rec;else jobs.unshift(rec);
-  saveJobs();renderJobs();return true;
+  saveJobs();baseSnap();renderJobs();return true;
 }
 var tblT;
 function schedTable(){clearTimeout(tblT);tblT=setTimeout(renderTable,700)}
@@ -1505,7 +1513,7 @@ function openJob(id){
   var j=jobs.find(function(k){return k.id===id});if(!j)return;
   if(id===data.id){$("msg").textContent="هذا الزبون مفتوح الآن.";go("sections");return}
   if(!storeCurrent()&&dirty()){if(!confirm("بيانات الزبون الحالي بدون اسم ولن تُحفظ. هل تريد المتابعة وفتح الزبون المختار؟"))return}
-  data=JSON.parse(JSON.stringify(j.d));data.id=j.id;fixData();save();loadInputs();render();
+  data=JSON.parse(JSON.stringify(j.d));data.id=j.id;fixData();save();loadInputs();render();baseSnap();
   $("msg").textContent="تم فتح "+j.name+". عدّل ثم اضغط حفظ للزبون.";go("sections");
   try{window.scrollTo(0,0)}catch(e){}
 }
@@ -1516,11 +1524,12 @@ $("jsave").onclick=function(){
 $("jnew").onclick=function(){
   var saved=storeCurrent();
   if(!saved&&dirty()){if(!confirm("بيانات الزبون الحالي بدون اسم ولن تُحفظ. هل تريد المتابعة؟"))return}
-  data=blank();data.id=uid();save();loadInputs();render();
+  data=blank();data.id=uid();save();loadInputs();render();baseSnap();
   $("msg").textContent=saved?"تم حفظ الزبون السابق وفتح زبون جديد.":"زبون جديد.";
   try{window.scrollTo(0,0)}catch(e){}
 };
 if(!MGR){$("pdfc").style.display="none"}
+(function(){var j=jobs.find(function(k){return k.id===data.id});curBase=j?snap(j.d):""})();
 renderJobs();
 render();
 
@@ -1554,7 +1563,12 @@ $("ximf").onchange=function(){
 };
 
 /* ---- نسخ وتصدير كل الزبائن ---- */
-window.__dijlaReloadJobs=function(){try{jobs=JSON.parse(localStorage.getItem(JK)||"[]")||[]}catch(e){}renderJobs()};
+window.__dijlaReloadJobs=function(){
+  try{jobs=JSON.parse(localStorage.getItem(JK)||"[]")||[]}catch(e){}
+  try{var j=jobs.find(function(k){return k.id===data.id});
+    if(j&&snap(data)===curBase&&snap(j.d)!==snap(data)){data=JSON.parse(JSON.stringify(j.d));data.id=j.id;fixData();save();loadInputs();render();baseSnap()}}catch(e){}
+  renderJobs();if($("scr-search")&&!$("scr-search").hidden)renderSearch();if($("scr-meas")&&!$("scr-meas").hidden)renderMeas();
+};
 function withData(d,fn){var keep=data;data=d;try{return fn()}finally{data=keep}}
 function normJob(j){var c=JSON.parse(JSON.stringify(j.d||{}));withData(c,fixData);return c}
 function jstat(t){$("jstat").textContent=t}
@@ -1827,61 +1841,50 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
     }
   }
 
+  async function pool(list, n, fn) {
+    var i = 0;
+    async function w() { while (i < list.length) { var x = list[i++]; await fn(x); } }
+    var ws = [], q; for (q = 0; q < Math.min(n, list.length); q++) ws.push(w());
+    await Promise.all(ws);
+  }
   async function sync() {
     if (!authGet()) return;
     if (busy) { again = true; return; }
     if (!navigator.onLine) { status("لا يوجد اتصال: ستتم المزامنة تلقائياً عند عودة الإنترنت."); return; }
     busy = true; status("جارٍ المزامنة…");
     try {
-      var jobs = get(JK, []), known = get(KK, []), tomb = get(TK, {});
-      var pulled = 0, pushed = 0, big = 0, i;
+      var jobs = get(JK, []), pulled = 0, pushed = 0, big = 0, i;
       var byId = {}; jobs.forEach(function (j) { byId[j.id] = j; });
-
-      known.forEach(function (id) { if (!byId[id] && !tomb[id]) tomb[id] = Date.now(); });
-      jobs.forEach(function (j) { if (tomb[j.id] && (j.at || 0) > tomb[j.id]) delete tomb[j.id]; });
-
       var idx = (await api("list")).index || {};
-      var id, r, l;
+      var id, r, l, down = [], up = [];
 
+      /* لا يتم حذف أي زبون بالمزامنة: الغياب لا يعني الحذف */
       for (id in idx) {
-        r = idx[id]; l = byId[id];
-        if (r.del) {
-          if (l && (l.at || 0) <= r.at) { jobs = jobs.filter(function (j) { return j.id !== id; }); delete byId[id]; pulled++; }
-          delete tomb[id];
-          continue;
-        }
-        if (tomb[id] && tomb[id] >= r.at) continue;
-        if (!l || (l.at || 0) < r.at) {
-          var rec = (await api("get", null, "&id=" + encodeURIComponent(id))).rec;
-          if (rec && rec.id) {
-            if (l) jobs = jobs.filter(function (j) { return j.id !== id; });
-            jobs.push(rec); byId[id] = rec; pulled++; delete tomb[id];
-          }
-        }
+        r = idx[id]; if (r.del) continue; l = byId[id];
+        if (!l || (l.at || 0) < r.at) down.push(id);
       }
+      await pool(down, 4, async function (pid) {
+        var rec = (await api("get", null, "&id=" + encodeURIComponent(pid))).rec;
+        if (rec && rec.id) {
+          var k = -1, q; for (q = 0; q < jobs.length; q++) { if (jobs[q].id === rec.id) { k = q; break; } }
+          if (k >= 0) jobs[k] = rec; else jobs.push(rec);
+          byId[rec.id] = rec; pulled++;
+        }
+      });
 
       for (i = 0; i < jobs.length; i++) {
         l = jobs[i]; r = idx[l.id];
-        if (!r || (l.at || 0) > r.at) {
-          var s = JSON.stringify({ rec: l });
-          if (s.length > MAXREC) { big++; continue; }
-          await api("put", { rec: l });
-          pushed++;
+        if (!r || r.del || (l.at || 0) > r.at) {
+          if (JSON.stringify({ rec: l }).length > MAXREC) { big++; continue; }
+          up.push(l);
         }
       }
-
-      for (id in tomb) {
-        r = idx[id];
-        if (!r || (!r.del && r.at < tomb[id])) { await api("del", { id: id, at: tomb[id] }); pushed++; }
-        if (!r || r.del || r.at < tomb[id]) delete tomb[id];
-      }
+      await pool(up, 3, async function (rec) { await api("put", { rec: rec }); pushed++; });
 
       jobs.sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
-      set(KK, jobs.map(function (j) { return j.id; }));
-      set(TK, tomb);
       if (pulled > 0) {
         var curJ = get(JK, []);
-        curJ.forEach(function (c) { var k = -1, q; for (q = 0; q < jobs.length; q++) { if (jobs[q].id === c.id) { k = q; break; } } if (k >= 0) { if ((c.at || 0) > (jobs[k].at || 0)) jobs[k] = c; } else if (known.indexOf(c.id) < 0) jobs.push(c); });
+        curJ.forEach(function (c) { var k = -1, q; for (q = 0; q < jobs.length; q++) { if (jobs[q].id === c.id) { k = q; break; } } if (k >= 0) { if ((c.at || 0) > (jobs[k].at || 0)) jobs[k] = c; } else jobs.push(c); });
         jobs.sort(function (a, b) { return (b.at || 0) - (a.at || 0); });
         set(JK, jobs);
       }
@@ -1898,7 +1901,7 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
     busy = false;
     if (again) { again = false; schedule(); }
   }
-  function schedule() { clearTimeout(timer); timer = setTimeout(sync, 2500); }
+  function schedule() { clearTimeout(timer); timer = setTimeout(sync, 700); }
 
   /* ---------- الواجهة ---------- */
   function btn(txt, fn, primary) {
@@ -1957,7 +1960,7 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
       box.appendChild(nr);
     } else if (a) {
       var who = document.createElement("div"); who.style.cssText = "font-weight:800;font-size:17px"; who.textContent = "الحساب: " + a.u; box.appendChild(who);
-      var hint = document.createElement("div"); hint.style.cssText = "font-size:13px;color:var(--mut)"; hint.textContent = "تتم المزامنة تلقائياً كل دقيقة تقريباً عند الاتصال بالإنترنت.";
+      var hint = document.createElement("div"); hint.style.cssText = "font-size:13px;color:var(--mut)"; hint.textContent = "تتم المزامنة تلقائياً خلال ثوانٍ من أي تعديل، وكل 15 ثانية عند الاتصال بالإنترنت.";
       box.appendChild(hint);
       row.appendChild(btn("مزامنة الآن", sync, true));
       var off = btn("تسجيل الخروج", function () {
@@ -1988,8 +1991,8 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
   setInterval(function () {
     var s = localStorage.getItem(JK) || "";
     if (s !== lastSeen) { lastSeen = s; if (authGet()) schedule(); }
-  }, 3000);
-  setInterval(function () { if (authGet() && !document.hidden && navigator.onLine) sync(); }, 60000);
+  }, 1000);
+  setInterval(function () { if (authGet() && !document.hidden && navigator.onLine) sync(); }, 15000);
 })();
 
 </script>
