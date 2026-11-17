@@ -2023,6 +2023,139 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
     ov.appendChild(card); document.body.appendChild(ov);
   }
 
+  /* ---------- قفل التطبيق (رمز PIN) ---------- */
+  var LKEY = "dijla-applock", LTRY = "dijla-applock-try", AWAY_MS = 60000, IDLE_MS = 300000;
+  var lockOv = null, hiddenAt = 0, lastAct = Date.now();
+  function lockCfg() { try { return JSON.parse(localStorage.getItem(LKEY) || "null"); } catch (e) { return null; } }
+  function hasCrypto() { return !!(window.crypto && crypto.subtle); }
+  function b64(u8) { var s = "", i; for (i = 0; i < u8.length; i++) s += String.fromCharCode(u8[i]); return btoa(s); }
+  async function hashPin(pin, saltB64) {
+    var salt = Uint8Array.from(atob(saltB64), function (c) { return c.charCodeAt(0); });
+    var km = await crypto.subtle.importKey("raw", new TextEncoder().encode(pin), "PBKDF2", false, ["deriveBits"]);
+    var bits = await crypto.subtle.deriveBits({ name: "PBKDF2", salt: salt, iterations: 150000, hash: "SHA-256" }, km, 256);
+    return b64(new Uint8Array(bits));
+  }
+  function tries() { try { return JSON.parse(localStorage.getItem(LTRY) || "{}") || {}; } catch (e) { return {}; } }
+  async function verifyPin(pin) {
+    var c = lockCfg(); if (!c) return { ok: true };
+    var t = tries(), now = Date.now();
+    if (t.until && t.until > now) return { ok: false, wait: Math.ceil((t.until - now) / 1000) };
+    var h = await hashPin(pin, c.s);
+    if (h === c.h) { try { localStorage.removeItem(LTRY); } catch (e) {} return { ok: true }; }
+    var n = (t.n || 0) + 1, until = 0;
+    if (n >= 5) until = now + Math.min(900, 30 * Math.pow(2, n - 5)) * 1000;
+    try { localStorage.setItem(LTRY, JSON.stringify({ n: n, until: until })); } catch (e) {}
+    return { ok: false, wait: until ? Math.ceil((until - now) / 1000) : 0 };
+  }
+  async function setPin(pin) {
+    var salt = crypto.getRandomValues(new Uint8Array(16)), sb = b64(salt);
+    localStorage.setItem(LKEY, JSON.stringify({ s: sb, h: await hashPin(pin, sb) }));
+    try { localStorage.removeItem(LTRY); } catch (e) {}
+  }
+  function fld(ph, pw) {
+    var i = document.createElement("input"); i.type = pw === false ? "text" : "password"; i.placeholder = ph; i.setAttribute("aria-label", ph);
+    if (pw !== "text" && pw !== false) { i.inputMode = "numeric"; i.setAttribute("autocomplete", "off"); }
+    i.style.cssText = "margin-bottom:10px;text-align:center;width:100%;box-sizing:border-box"; return i;
+  }
+  function modal(title, fields, okTxt, cb) {
+    var o = document.createElement("div");
+    o.style.cssText = "position:fixed;inset:0;z-index:2500;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(20,40,25,.45)";
+    var c = document.createElement("div");
+    c.style.cssText = "width:100%;max-width:360px;background:var(--card,#fff);border:1.5px solid var(--line);border-radius:24px;padding:20px;text-align:center";
+    var h = document.createElement("div"); h.textContent = title; h.style.cssText = "font-weight:800;font-size:18px;margin-bottom:12px";
+    var msg = document.createElement("div"); msg.style.cssText = "min-height:20px;font-size:14px;font-weight:700;color:var(--danger);margin-bottom:8px";
+    var row = document.createElement("div"); row.style.cssText = "display:flex;gap:8px;justify-content:center";
+    c.appendChild(h); fields.forEach(function (f) { c.appendChild(f); }); c.appendChild(msg);
+    var ok = btn(okTxt, async function () { ok.disabled = true; try { var r = await cb(fields.map(function (f) { return f.value; })); if (r) msg.textContent = r; else o.remove(); } catch (e) { msg.textContent = "حدث خطأ، حاول مرة أخرى."; } ok.disabled = false; }, true);
+    row.appendChild(ok); row.appendChild(btn("إلغاء", function () { o.remove(); }));
+    c.appendChild(row); o.appendChild(c); document.body.appendChild(o); if (fields[0]) fields[0].focus();
+  }
+  function waitMsg(r) { return "محاولات كثيرة. انتظر " + r.wait + " ثانية."; }
+  function checkNew(a, b) { if (!/^\d{4,8}$/.test(a)) return "الرمز من 4 إلى 8 أرقام."; if (a !== b) return "الرمزان غير متطابقين."; return ""; }
+  function setupLock() {
+    if (!hasCrypto()) { alert("هذا المتصفح لا يدعم القفل. افتح التطبيق من رابط https."); return; }
+    var a = fld("رمز جديد (4-8 أرقام)"), b = fld("أعد كتابة الرمز");
+    modal("تفعيل قفل التطبيق", [a, b], "تفعيل", async function (v) { var e = checkNew(v[0], v[1]); if (e) return e; await setPin(v[0]); ui(); });
+  }
+  function changeLock() {
+    var o = fld("الرمز الحالي"), a = fld("رمز جديد (4-8 أرقام)"), b = fld("أعد كتابة الرمز الجديد");
+    modal("تغيير الرمز", [o, a, b], "حفظ", async function (v) { var r = await verifyPin(v[0]); if (!r.ok) return r.wait ? waitMsg(r) : "الرمز الحالي غير صحيح."; var e = checkNew(v[1], v[2]); if (e) return e; await setPin(v[1]); ui(); });
+  }
+  function removeLock() {
+    var o = fld("الرمز الحالي");
+    modal("إلغاء القفل", [o], "إلغاء القفل", async function (v) { var r = await verifyPin(v[0]); if (!r.ok) return r.wait ? waitMsg(r) : "الرمز غير صحيح."; localStorage.removeItem(LKEY); localStorage.removeItem(LTRY); ui(); });
+  }
+  function lockNow() {
+    if (!lockCfg() || lockOv) return;
+    var o = document.createElement("div"); lockOv = o;
+    o.style.cssText = "position:fixed;inset:0;z-index:3000;display:flex;align-items:center;justify-content:center;padding:20px;overflow:auto;background:linear-gradient(165deg,#e4f4e2 0%,#f3f9ea 48%,#fdf2d9 100%)";
+    var c = document.createElement("div");
+    c.style.cssText = "width:100%;max-width:360px;text-align:center";
+    var h = document.createElement("div"); h.textContent = "التطبيق مقفل"; h.style.cssText = "font-size:24px;font-weight:800;color:var(--ink);margin-bottom:6px";
+    var sub = document.createElement("div"); sub.textContent = "اكتب رمز القفل للمتابعة"; sub.style.cssText = "font-size:14px;color:var(--mut);margin-bottom:14px";
+    var pin = fld("الرمز"); pin.style.fontSize = "22px";
+    var msg = document.createElement("div"); msg.style.cssText = "min-height:22px;font-size:14px;font-weight:700;color:var(--danger);margin-bottom:8px";
+    function unlock() { o.remove(); lockOv = null; lastAct = Date.now(); }
+    async function go() {
+      var r = await verifyPin(pin.value); pin.value = "";
+      if (r.ok) { unlock(); return; }
+      msg.textContent = r.wait ? waitMsg(r) : "الرمز غير صحيح.";
+    }
+    var okb = btn("فتح", go, true); okb.style.width = "100%";
+    pin.addEventListener("keydown", function (ev) { if (ev.key === "Enter") { ev.preventDefault(); go(); } });
+    c.appendChild(h); c.appendChild(sub); c.appendChild(pin); c.appendChild(msg); c.appendChild(okb);
+    if (READY && authGet()) {
+      var fg = document.createElement("button"); fg.type = "button"; fg.textContent = "نسيت الرمز؟";
+      fg.style.cssText = "margin-top:14px;background:none;border:none;color:var(--mut);font:inherit;text-decoration:underline;cursor:pointer";
+      fg.onclick = function () {
+        var pw = fld("كلمة مرور الحساب", "text"); pw.type = "password";
+        modal("استرجاع الدخول", [pw], "تأكيد", async function (v) {
+          var a = authGet(); if (!a) return "سجّل الدخول أولاً.";
+          if (!navigator.onLine) return "لا يوجد اتصال بالإنترنت.";
+          try { await idp("signInWithPassword", { email: emailOf(a.u), password: v[0], returnSecureToken: true }); }
+          catch (e) { return errAr(e); }
+          localStorage.removeItem(LKEY); localStorage.removeItem(LTRY); unlock(); ui();
+        });
+      };
+      c.appendChild(fg);
+    }
+    o.appendChild(c); document.body.appendChild(o); setTimeout(function () { pin.focus(); }, 50);
+  }
+  function lockSection(box) {
+    var w = document.createElement("div"); w.style.cssText = "margin-top:12px";
+    var t = document.createElement("div"); t.style.cssText = "font-weight:800;margin-bottom:6px"; t.textContent = lockCfg() ? "قفل التطبيق: مفعّل" : "قفل التطبيق: غير مفعّل";
+    var hint = document.createElement("div"); hint.style.cssText = "font-size:13px;color:var(--mut);margin-bottom:6px";
+    hint.textContent = lockCfg() ? "يُقفل تلقائياً بعد دقيقة من مغادرة التطبيق أو 5 دقائق بدون استخدام." : "يمنع أي شخص يمسك هاتفك من فتح الزبائن.";
+    var r = document.createElement("div"); r.style.cssText = "display:flex;gap:8px;flex-wrap:wrap";
+    if (lockCfg()) { r.appendChild(btn("قفل الآن", lockNow, true)); r.appendChild(btn("تغيير الرمز", changeLock)); r.appendChild(btn("إلغاء القفل", removeLock)); }
+    else r.appendChild(btn("تفعيل قفل التطبيق", setupLock, true));
+    w.appendChild(t); w.appendChild(hint); w.appendChild(r); box.appendChild(w);
+  }
+  async function secCheck(out) {
+    out.textContent = "جارٍ الفحص…"; var res = [];
+    try {
+      var r = await fetch(DB.replace(/\/+$/, "") + "/dijla.json?shallow=true");
+      if (r.status === 401 || r.status === 403) res.push("✅ قاعدة البيانات ترفض القراءة بدون تسجيل دخول.");
+      else if (r.ok) res.push("❌ خطر: قاعدة البيانات تسمح بالقراءة بدون حساب! عدّل Rules في Firebase.");
+      else res.push("⚠️ نتيجة غير متوقعة للقاعدة (" + r.status + ").");
+    } catch (e) { res.push("⚠️ تعذر فحص القاعدة (لا اتصال)."); }
+    try {
+      var r2 = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + AK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "chk" + Date.now() + "@dijla.app", password: "1" }) });
+      var j = await r2.json(), m = (j.error && j.error.message) || "";
+      if (/ADMIN_ONLY|OPERATION_NOT_ALLOWED/.test(m)) res.push("✅ إنشاء حسابات جديدة معطّل.");
+      else if (/WEAK_PASSWORD/.test(m)) res.push("❌ إنشاء الحسابات الجديدة مفعّل: عطّله من Authentication > Settings > User actions.");
+      else res.push("⚠️ فحص إنشاء الحسابات غير حاسم (" + (m || r2.status) + ").");
+    } catch (e) { res.push("⚠️ تعذر فحص إنشاء الحسابات (لا اتصال)."); }
+    out.textContent = res.join("\n");
+  }
+  document.addEventListener("visibilitychange", function () {
+    if (document.hidden) hiddenAt = Date.now();
+    else if (hiddenAt && Date.now() - hiddenAt >= AWAY_MS) { hiddenAt = 0; lockNow(); }
+  });
+  ["touchstart", "click", "keydown", "scroll"].forEach(function (ev) { document.addEventListener(ev, function () { lastAct = Date.now(); }, { passive: true, capture: true }); });
+  setInterval(function () { if (!document.hidden && Date.now() - lastAct >= IDLE_MS) lockNow(); }, 5000);
+  lockNow();
+
   var box = null;
   function ui() {
     var sd = $("sd"); if (!sd) return;
@@ -2051,7 +2184,14 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
     stEl = document.createElement("div"); stEl.style.cssText = "margin-top:8px;font-size:14px";
     var lt = parseInt(localStorage.getItem(LK) || "0", 10);
     if (a && lt) stEl.textContent = "آخر مزامنة: " + hhmm(lt);
-    box.appendChild(stEl); sd.appendChild(box);
+    box.appendChild(stEl);
+    lockSection(box);
+    if (READY) {
+      var sw = document.createElement("div"); sw.style.cssText = "margin-top:12px";
+      var so = document.createElement("div"); so.style.cssText = "margin-top:6px;font-size:14px;white-space:pre-line";
+      sw.appendChild(btn("فحص أمان المزامنة", function () { secCheck(so); })); sw.appendChild(so); box.appendChild(sw);
+    }
+    sd.appendChild(box);
     if (typeof window.__onAuth === "function") window.__onAuth();
   }
   window.__dijlaUser = function () { var a = authGet(); return a ? a.u : ""; };
