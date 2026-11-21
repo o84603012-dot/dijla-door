@@ -57,6 +57,20 @@ select:focus,input:focus,button:focus-visible,.photo:focus-within{outline:3px so
 .job button{font:inherit;font-weight:700;padding:6px 12px;border:2px solid var(--pen);border-radius:4px;background:none;color:var(--pen)}
 .job button.del{border-color:var(--danger);color:var(--danger)}
 .jempty{color:var(--mut);padding:10px 0 2px}
+.stm .box{border:1.5px solid var(--line);border-radius:18px;padding:12px 14px;margin:0 0 12px;background:rgba(255,255,255,.85)}
+.stm h3{margin:0 0 8px;font-size:17px}
+.stm .kv{display:flex;justify-content:space-between;gap:12px;padding:5px 0;border-top:1px dashed var(--line);font-size:14px}
+.stm .kv:first-of-type{border-top:none}
+.stm .kv span{color:var(--mut);flex:0 0 auto}.stm .kv b{text-align:left;flex:1;word-break:break-word}
+.stm .chips{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stm .chip{border:1.5px solid var(--line);border-radius:14px;padding:8px;text-align:center;font-weight:800;background:#fff}
+.stm .chip small{display:block;font-weight:600;color:var(--mut)}
+.stm .item{border:1.5px solid var(--line);border-radius:14px;padding:8px 12px;margin-top:10px;background:#fff}
+.stm .item>b{display:block;margin-bottom:4px}
+.stm img{max-width:100%;border:2px solid var(--line);border-radius:8px;margin-top:8px;display:block}
+.stm .tt{font-size:18px;font-weight:800;border-top:2px solid var(--ink);margin-top:6px;padding-top:8px;display:flex;justify-content:space-between}
+.stbar{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 12px}
+.stbar button{font:inherit;font-weight:800;padding:8px 14px;border:2px solid var(--pen);border-radius:14px;background:#fff;color:var(--pen)}
 .opts{display:flex;gap:6px;flex-wrap:wrap}
 .opts button{font:inherit;font-weight:700;padding:8px 14px;border:2px solid var(--pen);border-radius:4px;background:none;color:var(--pen)}
 .opts button[aria-pressed="true"]{background:var(--sel);color:var(--selt)}
@@ -152,7 +166,7 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 <div class="menu">
 <button type="button" class="menu-new" id="mnew"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg><span>إضافة قياس جديد</span></button>
 <button type="button" id="mcust"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c0-3.5 2.7-6 6-6s6 2.5 6 6"/><circle cx="17" cy="9" r="2.5"/><path d="M16 14.3c2.8.2 5 2.4 5 5.7"/></svg><span>الزبائن <span id="mcnt"></span></span></button>
-<button type="button" id="msearch"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="6.5"/><path d="M16 16l5 5"/></svg><span>البحث عن زبون</span></button>
+<button type="button" id="msearch"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 3h9l4 4v14H6z"/><path d="M15 3v4h4M9 12h7M9 16h7"/></svg><span>كشف حساب زبون</span></button>
 <button type="button" id="mmat"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7.5l9-4.5 9 4.5v9l-9 4.5-9-4.5z"/><path d="M3 7.5l9 4.5 9-4.5M12 12v9"/></svg><span>المواد</span></button>
 <button type="button" id="msync"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 11a8 8 0 0 0-14-4.5L4 9"/><path d="M4 4v5h5"/><path d="M4 13a8 8 0 0 0 14 4.5L20 15"/><path d="M20 20v-5h-5"/></svg><span>المزامنة</span></button>
 <button type="button" id="mmeas"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 17L17 3l4 4L7 21z"/><path d="M7 13l2 2M10 10l2 2M13 7l2 2"/></svg><span>القياسات (<span id="mmcnt">0</span>)</span></button>
@@ -216,9 +230,12 @@ select{appearance:none;-webkit-appearance:none;background-image:url("data:image/
 </section>
 
 <section data-scr="search" id="scr-search" hidden>
-<h2 class="scr-h">البحث عن زبون</h2>
-<input id="sq" class="sq" type="search" placeholder="اسم الزبون أو الهاتف أو العنوان" aria-label="البحث عن زبون">
+<h2 class="scr-h">كشف حساب زبون</h2>
+<div id="slistw">
+<input id="sq" class="sq" type="search" placeholder="ابحث باسم الزبون أو الهاتف أو العنوان" aria-label="البحث في الزبائن">
 <div id="sres"></div>
+</div>
+<div id="sdet" class="stm" hidden></div>
 </section>
 
 <section data-scr="sections" id="scr-sections" hidden>
@@ -1421,7 +1438,7 @@ var curBase="";
 function snap(d){try{var c=JSON.parse(JSON.stringify(d));["st","done","deleted","need"].forEach(function(k){delete c[k]});return JSON.stringify(prune(c)||null)}catch(e){return ""}}
 function isDel(d){return !!(d&&d.deleted)}
 function isArch(d){return !!(d&&d.done&&!d.deleted)}
-function activeJobs(){return jobs.filter(function(j){return j.d&&!j.d.deleted&&!j.d.done})}
+function activeJobs(){return jobs.filter(function(j){return j.d&&!j.d.deleted&&!j.d.done&&!j.d.need})}
 function unsaved(){if(!dirty())return false;var i=jobs.findIndex(function(j){return j.id===data.id});return i<0||snap(data)!==curBase}
 function baseSnap(){curBase=snap(data)}
 function uid(){return "j"+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
@@ -1694,7 +1711,7 @@ function go(n){
   document.querySelectorAll("[data-scr]").forEach(function(e){e.hidden=e.dataset.scr!==n});
   $("backBtn").hidden=(n==="home");
   if(n==="customers")renderTable();
-  if(n==="search")renderSearch();
+  if(n==="search"){$("sdet").hidden=true;$("slistw").hidden=false;renderSearch()}
   if(n==="meas")renderMeas();
   if(n==="arch")renderArch();
   if(n==="dele"){var dm=$("dmsg");if(dm)dm.textContent="";renderDele()}
@@ -1729,16 +1746,80 @@ $("march").onclick=function(){go("arch")};
 $("mdel").onclick=function(){go("dele")};
 function renderSearch(){
   var q=($("sq").value||"").trim().toLowerCase(),L=$("sres");
-  var rows=tblRows().filter(function(r){return !q||[r.n,r.p,r.a,r.by,r.det,r.dt].join(" ").toLowerCase().indexOf(q)>=0});
+  var rows=jobs.filter(function(j){return j.d&&!j.d.deleted&&!j.d.need}).map(function(j){var c=j.d.c||{};return {id:j.id,n:c.n||j.name||"-",p:c.p||"",a:c.a||"",dt:(c.d||"").replace(/-/g,"/"),det:detText(j.d),arch:isArch(j.d),st:stOf(j.d),grn:instGreen(j.d),ts:addedTs(j)}});
+  rows=rows.filter(function(r){return !q||[r.n,r.p,r.a,r.det,r.dt].join(" ").toLowerCase().indexOf(q)>=0}).sort(function(a,b){return b.ts-a.ts});
   L.innerHTML="";
   if(!rows.length){L.appendChild(mk("div","jempty",q?"لا توجد نتائج.":"لا يوجد زبائن محفوظون بعد."));return}
   rows.forEach(function(r){
-    var c=mk("div","job"),n=mk("div","jn"),o=mk("button",null,"فتح");
-    n.appendChild(mk("b",r.grn?"gn":null,r.n));
-    n.appendChild(mk("span",null,[r.p,r.a,r.dt,r.det,r.by?"أخذ القياس: "+r.by:""].filter(Boolean).join(" | ")));
-    o.type="button";o.onclick=function(){openJob(r.id)};
-    n.appendChild(stBtns(r));if(r.st)c.className+=" st-"+r.st;c.appendChild(n);c.appendChild(o);L.appendChild(c);
+    var c=mk("div","job"),n=mk("div","jn"),o=mk("button",null,"كشف الحساب");
+    n.appendChild(mk("b",(r.grn||r.arch)?"gn":null,r.n));
+    n.appendChild(mk("span",null,[r.p,r.a,r.dt,r.det,r.arch?"مؤرشف":(r.st?STL[r.st]:"")].filter(Boolean).join(" | ")));
+    o.type="button";o.onclick=function(){showStmt(r.id)};
+    if(r.st&&!r.arch)c.className+=" st-"+r.st;if(r.arch)c.className+=" st-done";
+    c.appendChild(n);c.appendChild(o);L.appendChild(c);
   });
+}
+function stmtKV(box,a,b){var r=mk("div","kv");r.appendChild(mk("span",null,a));r.appendChild(mk("b",null,b));box.appendChild(r)}
+function splitKV(l){var i=l.indexOf(": ");return i>0?[l.slice(0,i),l.slice(i+2)]:["",l]}
+var STMT_ATTR=[["loc","الموقع"],["dir","الاتجاه"],["thr","العثرة"],["col","اللون"],["typ","النوع"],["mv","النوع"],["vm","المادة"],["mat","المادة"],["glz","الزجاج"],["cool","المبردة"],["arc","قوس أو عدل"],["mt","نوع المحجل"]];
+function stmtItem(k,d,i){
+  var it=mk("div","item"),title=[d.vn,d.loc].filter(Boolean).join(" - ")||(K[k].s+" "+(i+1));
+  it.appendChild(mk("b",null,(i+1)+". "+title));
+  if(d.w||d.h)stmtKV(it,"القياس",(d.w||"-")+" × "+(d.h||"-")+" سم");
+  if(AREAK[k]){var a=areaOf(k,d);if(a>0)stmtKV(it,"المساحة",fmt(a)+" م²")}
+  if(mxUsed(d))stmtKV(it,"قياسات إضافية",mxText(d));
+  STMT_ATTR.forEach(function(x){if(d[x[0]]&&x[0]!=="loc")stmtKV(it,x[1],String(d[x[0]]))});
+  if(k==="counters"){
+    CF1.concat(CF2,CF3).forEach(function(x){if(d[x[0]])stmtKV(it,x[1],String(d[x[0]]))});
+    (d.dm||[]).forEach(function(e){if(e&&e.v)stmtKV(it,e.n||"قياس",e.v+" سم")});
+    if(d.cm)stmtKV(it,"مجموع أمتار الكاونتر",d.cm+" م");if(d.gt)stmtKV(it,"مجموع أمتار الكرانيت",d.gt+" م");
+    kmLines(d).forEach(function(l){var q=splitKV(l);stmtKV(it,q[0]||"مادة",q[1])});
+  }
+  if(k==="mahjalat"){mjLines(d).forEach(function(l){var q=splitKV(l);stmtKV(it,q[0]||"تفصيل",q[1])})}
+  if(exUsed(d))stmtKV(it,"إضافة على الحساب",(d.ex||[]).filter(function(e){return e&&(e.t||e.p)}).map(function(e){var q=parseFloat(e.p)||0;return ((e.t||"").trim()||"بند")+(MGR&&q>0?" ("+mf(q,d)+")":"")}).join("، "));
+  if(d.note)stmtKV(it,"ملاحظة",d.note);
+  if(MGR){var am=pamt(k,d);if(am>0)stmtKV(it,"المبلغ",mf(am,d))}
+  [["ydp","صورة اليدة"],["draw","الرسم"],["photo","صورة مرفقة"]].forEach(function(x){if(d[x[0]]&&/^data:image|^https?:/.test(d[x[0]])){var im=document.createElement("img");im.src=d[x[0]];im.alt=x[1];im.loading="lazy";it.appendChild(im)}});
+  return it;
+}
+function stmtDom(j){
+  var c=normJob(j);
+  return withData(c,function(){
+    var root=mk("div",null),cc=c.c||{};
+    var hd=mk("div","box");hd.appendChild(mk("h3",null,cc.n||j.name||"-"));
+    [["الهاتف",cc.p],["العنوان",cc.a],["موعد التركيب",cc.d],["أخذ القياس",c.by],["الحالة",c.deleted?"محذوف":c.done?STL.done+" (مؤرشف)":(c.st?STL[c.st]:(c.need?"بانتظار أخذ القياس":""))]].forEach(function(x){if(x[1])stmtKV(hd,x[0],x[1])});
+    root.appendChild(hd);
+    var sm=mk("div","box"),chips=mk("div","chips"),any=false,ta=0;
+    sm.appendChild(mk("h3",null,"ملخص الطلب"));
+    ORDER.forEach(function(k){var l=(c[k]||[]).filter(function(d){return used(k,d)});if(!l.length)return;any=true;
+      var ch=mk("div","chip",String(l.length));ch.appendChild(mk("small",null,l.length===1?PH[k][0]:PH[k][1]));chips.appendChild(ch);
+      if(AREAK[k])l.forEach(function(d){ta+=areaOf(k,d)})});
+    if(!any)sm.appendChild(mk("div","jempty","لا توجد تفاصيل مدخلة لهذا الزبون بعد."));
+    else{sm.appendChild(chips);if(ta>0){var ar=mk("div","kv");ar.style.marginTop="8px";ar.appendChild(mk("span",null,"مجموع مساحة الشبابيك والهوائيات"));ar.appendChild(mk("b",null,fmt(ta)+" م²"));sm.appendChild(ar)}}
+    root.appendChild(sm);
+    ORDER.forEach(function(k){
+      var l=(c[k]||[]).filter(function(d){return used(k,d)});if(!l.length)return;
+      var bx=mk("div","box");bx.appendChild(mk("h3",null,K[k].t+" ("+l.length+")"));
+      l.forEach(function(d,i){bx.appendChild(stmtItem(k,d,i))});root.appendChild(bx);
+    });
+    if(MGR){
+      var ac=mk("div","box"),gt=0,gi=0;ac.appendChild(mk("h3",null,"الحساب"));
+      ORDER.forEach(function(k){var q=calc(k);gt+=q.amt;gi+=q.ami;if(q.n)stmtKV(ac,K[k].t,q.has?tm2(q.amt,q.ami):"-")});
+      var t=mk("div","tt");t.appendChild(mk("span",null,"المبلغ الكلي"));t.appendChild(mk("span",null,tm2(gt,gi)));ac.appendChild(t);root.appendChild(ac);
+    }
+    return root;
+  });
+}
+function showStmt(id){
+  var j=jobs.find(function(k){return k.id===id});if(!j)return;
+  var D=$("sdet");D.innerHTML="";
+  var bar=mk("div","stbar");
+  var b1=mk("button",null,"رجوع للقائمة");b1.type="button";b1.onclick=function(){D.hidden=true;$("slistw").hidden=false;renderSearch();try{window.scrollTo(0,0)}catch(e){}};
+  var b2=mk("button",null,"تعديل");b2.type="button";b2.onclick=function(){openJob(id)};
+  var b3=mk("button",null,"نسخ الكشف");b3.type="button";b3.onclick=function(){copyText(jobText(j)).then(function(){b3.textContent="تم النسخ"},function(){b3.textContent="تعذر النسخ"})};
+  bar.appendChild(b1);bar.appendChild(b2);bar.appendChild(b3);
+  D.appendChild(bar);D.appendChild(stmtDom(j));
+  $("slistw").hidden=true;D.hidden=false;try{window.scrollTo(0,0)}catch(e){}
 }
 $("sq").addEventListener("input",renderSearch);
 var NK="dijla-notified";
@@ -2140,10 +2221,15 @@ if("serviceWorker" in navigator && (location.protocol === "https:" || location.h
       else res.push("⚠️ نتيجة غير متوقعة للقاعدة (" + r.status + ").");
     } catch (e) { res.push("⚠️ تعذر فحص القاعدة (لا اتصال)."); }
     try {
-      var r2 = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + AK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "chk" + Date.now() + "@dijla.app", password: "1" }) });
+      var pw = "Chk-" + Math.random().toString(36).slice(2) + Math.random().toString(36).slice(2) + "9A";
+      var r2 = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=" + AK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: "chk" + Date.now() + "@dijla.app", password: pw, returnSecureToken: true }) });
       var j = await r2.json(), m = (j.error && j.error.message) || "";
-      if (/ADMIN_ONLY|OPERATION_NOT_ALLOWED/.test(m)) res.push("✅ إنشاء حسابات جديدة معطّل.");
-      else if (/WEAK_PASSWORD/.test(m)) res.push("❌ إنشاء الحسابات الجديدة مفعّل: عطّله من Authentication > Settings > User actions.");
+      if (r2.ok && j.idToken) {
+        var del = "";
+        try { var r3 = await fetch("https://identitytoolkit.googleapis.com/v1/accounts:delete?key=" + AK, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ idToken: j.idToken }) }); del = r3.ok ? " (تم حذف الحساب التجريبي تلقائياً)" : " (تعذر حذف الحساب التجريبي chk… احذفه من Firebase)"; } catch (e) { del = " (احذف الحساب التجريبي chk… من Firebase)"; }
+        res.push("❌ إنشاء الحسابات الجديدة ما زال مفعّلاً" + del + ". عطّله من Authentication > Settings > User actions.");
+      }
+      else if (/ADMIN_ONLY|OPERATION_NOT_ALLOWED/.test(m)) res.push("✅ إنشاء حسابات جديدة معطّل.");
       else res.push("⚠️ فحص إنشاء الحسابات غير حاسم (" + (m || r2.status) + ").");
     } catch (e) { res.push("⚠️ تعذر فحص إنشاء الحسابات (لا اتصال)."); }
     out.textContent = res.join("\n");
