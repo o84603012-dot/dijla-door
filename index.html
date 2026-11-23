@@ -603,7 +603,9 @@ function(){return WH([1,1],P2())},function(){return WH([1,1,1],P3())},
 function(){return WH([1,3],[WP(),WV([1,1],P2())])},function(){return WH([3,1],[WV([1,1],P2()),WP()])},
 function(){return WH([1,3],[WP(),WV([1,1,1],P3())])},function(){return WV([1,1],[WP(),WH([1,1],P2())])},
 function(){return WV([1,1],[WH([1,1],P2()),WP()])},function(){return WV([1,1,1],[WP(),WH([1,1],P2()),WP()])},
-function(){return WV([1,1],[WH([1,1],P2()),WH([1,1],P2())])},function(){return WV([3,1],P2())},function(){return WV([1,3,1],P3())},function(){return WH([1,4],[WV([1,1],P2()),WV([1,1],P2())])}];
+function(){return WV([1,1],[WH([1,1],P2()),WH([1,1],P2())])},function(){return WV([3,1],P2())},function(){return WV([1,3,1],P3())},function(){return WH([1,4],[WV([1,1],P2()),WV([1,1],P2())])},
+function(){var c=function(){return WH([3,14,4],P3())};return WV([1,1,1],[c(),c(),c()])},
+function(){var c=function(){return WH([3,1],P2())};return WV([1,1,1],[c(),c(),c()])}];
 var WO=[["sr","سحب →"],["tl","قلاب"],["sl","سحب ←"],["hl","مفصلة يسار"],["fix","ثابت"],["hr","مفصلة يمين"],["ttl","فتح وقلاب يسار"],["tu","علوي"],["ttr","فتح وقلاب يمين"]];
 var WS=[["none","بدون"],["v2","عمودين"],["v3","3 أعمدة"],["h2","صفين"],["h3","3 صفوف"],["g22","شبكة 2×2"]],wdZ=9000;
 function wdNew(i,def,sl){var t=WT[i](),c=0;(function f(n){if(n.t==="p")n.o=sl?(c++%2?"sl":"sr"):def;else n.c.forEach(f)})(t);return t}
@@ -625,8 +627,8 @@ function wdSym(g,t,x,y,w,h,mini){
   g.save();g.strokeStyle="#1a3d7a";g.fillStyle="#fff";g.lineWidth=mini?1.5:2.5;g.lineJoin="round";
   var L=function(a){g.beginPath();a.forEach(function(p,i){i?g.lineTo(p[0],p[1]):g.moveTo(p[0],p[1])});g.stroke()},
   s=Math.max(mini?3:9,Math.min(w,h)*.08),yy=y+h/2;
-  if(t==="hl"||t==="ttl")L([[x+w,y],[x,yy],[x+w,y+h]]);
-  if(t==="hr"||t==="ttr")L([[x,y],[x+w,yy],[x,y+h]]);
+  if(t==="hl"||t==="ttl")L([[x,y],[x+w,yy],[x,y+h]]);
+  if(t==="hr"||t==="ttr")L([[x+w,y],[x,yy],[x+w,y+h]]);
   if(t==="tl"||t==="ttl"||t==="ttr")L([[x,y],[x+w/2,y+h],[x+w,y]]);
   if(t==="tu")L([[x,y+h],[x+w/2,y],[x+w,y+h]]);
   if(t==="sr"){L([[x+w*.25,yy],[x+w*.75,yy]]);L([[x+w*.75-s,yy-s],[x+w*.75,yy],[x+w*.75-s,yy+s]])}
@@ -698,7 +700,7 @@ function wdNum(val,cb){
 function wdOpen(d,kind,done){
   var CW=1000,CH=720,def=({doors:"hr",pres:"hr",windows:"ttr",slide:"sr",vents:"fix"})[kind]||"fix",sl=kind==="slide",m=null,
   W=parseFloat(d.w)||(kind==="vents"?80:150),H=parseFloat(d.h)||(kind==="vents"?60:150),o;
-  try{m=d.wm?JSON.parse(d.wm):null}catch(e){m=null}if(!m)m=wdNew(1,def,sl);
+  try{m=d.wm?JSON.parse(d.wm):null}catch(e){m=null}if(!m)m=wdNew(1,"fix",false);
   var l=wdLayer(),c=l.card,cv=document.createElement("canvas"),g;cv.width=CW;cv.height=CH;cv.style.cssText="width:100%;aspect-ratio:1000/720;border:2px solid var(--pen);border-radius:6px;background:#fff;display:block";g=cv.getContext("2d");
   var ti=document.createElement("div");ti.textContent="شبابيك وأبواب جاهزة";ti.style.cssText="font-weight:800;font-size:20px;margin-bottom:6px";c.appendChild(ti);
   var hn=document.createElement("div");hn.textContent="القياس الخارجي (العرض والارتفاع) يؤخذ من الخانات المكتوبة. المس أي رقم داخلي لتعديل القياس بالسنتيمتر، والمس أي جزء لاختيار طريقة الفتح أو تقسيمه.";hn.style.cssText="font-size:14px;color:var(--mut);margin-bottom:6px";c.appendChild(hn);c.appendChild(cv);
@@ -715,7 +717,7 @@ function wdOpen(d,kind,done){
     var t=document.createElement("div");t.textContent="اختر الترتيب";t.style.cssText="font-weight:800;font-size:18px;margin-bottom:8px";c2.appendChild(t);c2.appendChild(gr);
     WT.forEach(function(_,i){var b=document.createElement("button");b.type="button";b.style.cssText="padding:4px;border:2px solid var(--pen);border-radius:4px;background:#fff";
       b.appendChild(icon(function(q){var tr=wdNew(i,"fix",false);wdDraw(q,120,96,tr,150,120,true)},120,96));
-      b.onclick=function(){m=wdNew(i,def,sl);l2.remove();redraw()};gr.appendChild(b)});
+      b.onclick=function(){m=wdNew(i,"fix",false);l2.remove();redraw()};gr.appendChild(b)});
     var r=wdRow();r.appendChild(wdBtn("إغلاق",function(){l2.remove()}));c2.appendChild(r);
   }
   function paneDlg(p){
@@ -728,7 +730,7 @@ function wdOpen(d,kind,done){
     WO.forEach(function(s){var b=document.createElement("button");b.type="button";b.k=s[0];b.style.cssText="padding:4px;border:2px solid var(--pen);border-radius:4px;background:#fff;font:inherit;font-size:13px;font-weight:700;color:#111";
       b.appendChild(icon(function(q){q.fillStyle="#fff";q.fillRect(0,0,80,70);q.fillStyle="#cfe3f5";q.strokeStyle="#666";q.lineWidth=2;q.fillRect(8,6,64,58);q.strokeRect(8,6,64,58);wdSym(q,s[0],8,6,64,58,true)},80,70));
       b.appendChild(document.createTextNode(s[1]));b.onclick=function(){sel=s[0];hl()};ob.push(b);gr.appendChild(b)});
-    var r=wdRow();r.appendChild(wdBtn("نعم",function(){p.o=sel;if(sp!=="none")wdSplit(p,sp,sel);l2.remove();redraw()},true));r.appendChild(wdBtn("لا",function(){l2.remove()}));c2.appendChild(r);hl();
+    var r=wdRow();r.appendChild(wdBtn("نعم",function(){p.o=sel;if(sp!=="none")wdSplit(p,sp,"fix");l2.remove();redraw()},true));r.appendChild(wdBtn("لا",function(){l2.remove()}));c2.appendChild(r);hl();
   }
   var r=wdRow();r.appendChild(wdBtn("اختيار ترتيب آخر",tplDlg));
   r.appendChild(wdBtn("اعتماد في الرسم",function(){d.wm=JSON.stringify(m);d.w=String(W);d.h=String(H);var u=cv.toDataURL("image/jpeg",0.9);l.remove();done(u)},true));
